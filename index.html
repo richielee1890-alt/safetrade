@@ -57,6 +57,8 @@ input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:#000;padding:12px 18px;border-radius:100px;font-size:13px;font-weight:700;z-index:200;display:none;box-shadow:var(--shadow)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+/* HIDE NETLIFY BADGE - FREE FIX */
+iframe[src*="netlify"], div[data-netlify-badge], #netlify-badge, .netlify-badge, a[href*="netlify.com"]{ display:none !important; visibility:hidden !important; opacity:0 !important; pointer-events:none !important; }
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
@@ -151,6 +153,23 @@ async function handleRelease(btn){
 document.addEventListener("click",async(e)=>{ const t=e.target.closest("[data-a]"); if(!t) return; const a=t.dataset.a; if(a==="again") sellView(); if(a==="create") createDeal(); if(a==="copy"){const el=$("#lk");el.select();el.setSelectionRange(0,9999);navigator.clipboard.writeText(el.value);toast("Link copied"); } if(a==="pay") handlePay(); if(a==="rel") handleRelease(t); if(a==="dsp"){ if(confirm("Report this deal? Money will stay locked and support will review.")){ try{ await updateDoc(doc(db,"sellers",currentDeal.sellerPhone,"deals",currentDeal.id),{status:"DISPUTED"}); toast("Reported - money locked"); payView({...currentDeal,status:"DISPUTED"});}catch(err){toast(err.message);} } } });
 document.addEventListener("input",(e)=>{ if(e.target.id==="ac"||e.target.id==="bk") resolveAcct(); if(e.target.id==="am"){const v=Number(e.target.value||0);const el=$("#fee");if(el) el.innerHTML=v?`<span>You receive: <b>${N(v - v*0.03)}</b> (3% fee)</span>`:`<span>Enter price - 97% after fee</span>`;} });
 if(PAY){ try{ const snap=await getDoc(doc(db,"sellers",PAY[1],"deals",PAY[2])); if(snap.exists()) payView({id:snap.id,...snap.data()}); else payView(null); }catch{ payView(null); } } else { sellView(); }
+</script>
+<script>
+// HIDE NETLIFY BADGE - FREE FIX, NO UPGRADE NEEDED
+setInterval(()=>{
+  document.querySelectorAll('iframe, div, a, button').forEach(el=>{
+    try{
+      const html = (el.outerHTML||'').toLowerCase();
+      const txt = (el.textContent||'').toLowerCase();
+      if((html.includes('netlify') && html.includes('powered')) || txt.trim()==='powered by netlify'){
+        el.style.display='none';
+        el.remove();
+      }
+    }catch(e){}
+  });
+  const b = document.querySelector('[data-netlify-badge], #netlify-badge, .netlify-badge');
+  if(b) b.remove();
+}, 500);
 </script>
 </body>
 </html>
