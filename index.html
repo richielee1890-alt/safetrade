@@ -1,245 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Safe Trade - Sell Anything With Zero Risk</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://js.paystack.co/v1/inline.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>SafeTrade – Secure Escrow for Nigeria</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  /* === NETLIFY BADGE HIDER - DO NOT REMOVE === */
-  iframe[src*="netlify"], div[data-netlify-badge], a[href*="netlify.app"]{ display:none !important; visibility:hidden !important; opacity:0 !important; pointer-events:none !important; }
-  .netlify-badge, [class*="netlify"]{ display:none !important; }
-  body{ background:#0a0a0f; color:white; font-family:system-ui, sans-serif; }
-  .gold{ color:#facc15; }
-  .card{ background:#15151f; border:1px solid #2a2a3a; border-radius:20px; }
-  input,select{ background:#1e1e2e !important; border:1px solid #333 !important; color:white !important; border-radius:12px; padding:14px; width:100%; outline:none; }
-  .btn-gold{ background:#facc15; color:black; font-weight:800; padding:14px; border-radius:12px; width:100%; }
-  .btn-green{ background:#22c55e; color:white; font-weight:700; padding:10px; border-radius:10px; }
-  .btn-red{ background:#ef4444; color:white; font-weight:700; padding:10px; border-radius:10px; }
+:root{--bg:#070A12;--bg2:#0E1220;--card:#111527;--card2:#171C33;--line:#222845;--tx:#F5F6FA;--mu:#8A90A8;--gold:#FFD84D;--gold2:#FFC01E;--ok:#2ECC71;--bad:#FF5A5A;--warn:#FFB020;--shadow:0 20px 60px rgba(0,0,0,.5)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+body{background:radial-gradient(1200px 600px at 50% -20%, #1C2350 0%, var(--bg) 60%), var(--bg);color:var(--tx);min-height:100vh;padding:0 14px 100px}
+.wrap{max-width:780px;margin:0 auto}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:18px 2px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.5px}
+.logo span{color:var(--gold)}
+.badge-live{display:flex;align-items:center;gap:6px;background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.3);color:var(--ok);padding:6px 12px;border-radius:100px;font-size:11px;font-weight:700}
+.badge-live i{width:6px;height:6px;background:var(--ok);border-radius:50%;display:inline-block;box-shadow:0 0 8px var(--ok)}
+.hero-card{background:linear-gradient(180deg, var(--card) 0%, var(--bg2) 100%);border:1px solid var(--line);border-radius:28px;padding:28px 22px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden;margin-bottom:16px}
+.hero-card:before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle, rgba(255,216,77,.25) 0%, transparent 70%);pointer-events:none}
+.kicker{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.hero-card h1{font-size:28px;line-height:1.1;letter-spacing:-1px;margin-bottom:10px}
+.hero-card h1 em{color:var(--gold);font-style:normal}
+.hero-card p{color:var(--mu);font-size:14px;line-height:1.6}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px}
+.stat{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.stat b{display:block;font-size:16px;margin-bottom:2px}
+.stat span{font-size:11px;color:var(--mu);font-weight:600;text-transform:uppercase}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
+.card h3{font-size:17px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card .sub{color:var(--mu);font-size:13px;margin-bottom:16px;line-height:1.5}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mu);margin:12px 0 6px}
+input,select{width:100%;padding:15px 14px;border-radius:14px;border:1px solid var(--line);background:var(--bg2);color:var(--tx);font-size:15px;font-weight:500;outline:none;transition:.2s}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,216,77,.15)}
+.fee-box{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg, rgba(255,216,77,.12), rgba(255,192,30,.06));border:1px dashed var(--gold);border-radius:14px;padding:12px 14px;font-size:13px;margin:8px 0;color:#FFE9A0}
+.verify-box{border-radius:14px;padding:12px 14px;font-size:13px;margin:8px 0;font-weight:600}
+.v-idle{background:var(--bg2);border:1px solid var(--line);color:var(--mu)}
+.v-ok{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.4);color:var(--ok)}
+.v-bad{background:rgba(255,90,90,.12);border:1px solid rgba(255,90,90,.4);color:var(--bad)}
+.btn{width:100%;padding:16px;border:0;border-radius:100px;font-weight:800;font-size:15px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn:active{transform:scale(.98)}
+.gold{background:linear-gradient(180deg,var(--gold) 0%, var(--gold2) 100%);color:#000;box-shadow:0 8px 24px rgba(255,216,77,.35)}
+.green{background:var(--ok);color:#000}
+.wa{background:#25D366;color:#000;font-weight:800}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--tx)}
+.red{background:rgba(255,90,90,.12);border:1px solid rgba(255,90,90,.3);color:var(--bad)}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin:8px 0;font-weight:600}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px}
+.s-await{background:rgba(255,176,32,.15);color:var(--warn);border:1px solid rgba(255,176,32,.3)}
+.s-hold{background:rgba(46,204,113,.15);color:var(--ok);border:1px solid rgba(46,204,113,.3)}
+.note{border-radius:14px;padding:14px;font-size:13px;line-height:1.6;margin:10px 0}
+.n-ok{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.3)}
+.link-box{display:flex;gap:8px;margin-top:12px}
+.link-box input{flex:1;background:var(--bg2);font-size:13px;padding:12px}
+.steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:16px 0}
+.step{text-align:center;padding:10px 6px;border-radius:14px;background:var(--bg2);border:1px solid var(--line)}
+.step b{display:block;font-size:12px;margin-top:6px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:#000;padding:12px 18px;border-radius:100px;font-size:13px;font-weight:700;z-index:200;display:none;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+/* HIDE NETLIFY BADGE - FREE FIX */
+iframe[src*="netlify"], div[data-netlify-badge], #netlify-badge, .netlify-badge, a[href*="netlify.com"]{ display:none !important; visibility:hidden !important; opacity:0 !important; pointer-events:none !important; }
 </style>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
-<body class="p-4 max-w-md mx-auto">
-
-<!-- NORMAL SITE -->
-<div id="mainSite">
-  <div class="flex justify-between items-center py-4">
-    <h1 class="text-2xl font-black">🛡️ Safe <span class="gold">Trade</span></h1>
-    <span class="bg-green-500/10 text-green-400 text-xs px-3 py-1 rounded-full border border-green-500/30">● ESCROW LIVE</span>
-  </div>
-
-  <div class="card p-5">
-    <p class="text-yellow-400 text-xs font-bold tracking-widest">TRUSTED BY 1,200+ SELLERS IN NIGERIA</p>
-    <h2 class="text-3xl font-black mt-2">Sell anything with <span class="gold">zero risk.</span></h2>
-    <p class="text-gray-400 text-sm mt-2">We hold the buyer's money until they confirm delivery. You get paid instantly after. No stories.</p>
-    <div class="grid grid-cols-3 gap-2 mt-4 text-center">
-      <div class="card p-3"><p class="font-bold">₦3.2M+</p><p class="text-xs text-gray-400">SECURED</p></div>
-      <div class="card p-3"><p class="font-bold">97%</p><p class="text-xs text-gray-400">YOU KEEP</p></div>
-      <div class="card p-3"><p class="font-bold">&lt; 2 min</p><p class="text-xs text-gray-400">PAYOUT</p></div>
-    </div>
-  </div>
-
-  <div class="card p-5 mt-4" id="createBox">
-    <h3 class="font-bold text-lg">🔒 Create a Safe Deal</h3>
-    <p class="text-gray-400 text-sm">Your bank is verified by Paystack. Buyers pay into escrow, not directly to you.</p>
-    <label class="text-xs font-bold mt-4 block">WHAT ARE YOU SELLING?</label>
-    <input id="item" placeholder="e.g. iPhone 13 128GB - Neat" class="mt-1">
-    <label class="text-xs font-bold mt-3 block">PRICE (₦)</label>
-    <input id="amount" type="number" placeholder="e.g. 50000" class="mt-1">
-    <label class="text-xs font-bold mt-3 block">YOUR NAME</label>
-    <input id="sellerName" placeholder="Your name" class="mt-1">
-    <label class="text-xs font-bold mt-3 block">YOUR PHONE (0...)</label>
-    <input id="sellerPhone" placeholder="080..." maxlength="11" class="mt-1">
-    <label class="text-xs font-bold mt-3 block">BANK</label>
-    <select id="bankCode"><option value="">Select Bank...</option><option value="044">Access Bank</option><option value="058">GTBank</option><option value="011">First Bank</option><option value="033">UBA</option><option value="057">Zenith Bank</option><option value="070">Fidelity Bank</option><option value="214">FCMB</option><option value="032">Union Bank</option><option value="035">Wema Bank</option><option value="221">Stanbic IBTC</option><option value="232">Sterling Bank</option><option value="001">Jaiz Bank</option><option value="999">OPay</option><option value="9999">Moniepoint</option><option value="100">Kuda MFB</option></select>
-    <label class="text-xs font-bold mt-3 block">ACCOUNT NUMBER</label>
-    <input id="account" placeholder="10-digit account number" maxlength="10" class="mt-1">
-    <p id="accountName" class="text-green-400 text-sm mt-1"></p>
-    <button onclick="createDeal()" id="createBtn" class="btn-gold mt-4">Create Secure Link →</button>
-    <p id="createMsg" class="text-center text-sm mt-2"></p>
-    <div id="linkBox" class="hidden mt-3 bg-green-500/10 border border-green-500/30 p-3 rounded-xl">
-      <p class="text-xs text-gray-300">Share this link to buyer:</p>
-      <p id="dealLink" class="text-yellow-300 text-sm break-all font-bold"></p>
-      <button onclick="copyLink()" class="btn-green w-full mt-2">Copy Link</button>
-    </div>
-  </div>
-
-  <!-- BUYER VIEW -->
-  <div class="card p-5 mt-4 hidden" id="buyerBox">
-    <h3 class="font-bold text-lg">Buyer Checkout</h3>
-    <div id="dealDetails" class="text-sm text-gray-300 mt-2"></div>
-    <input id="buyerName" placeholder="Buyer name" class="mt-3">
-    <input id="buyerPhone" placeholder="Buyer phone 080..." class="mt-2">
-    <input id="buyerEmail" placeholder="Buyer email" class="mt-2">
-    <button onclick="payNow()" class="btn-gold mt-3">Pay Into Escrow →</button>
-    <button onclick="markReceived()" class="btn-green w-full mt-2 hidden" id="receivedBtn">I Received It - Release To Seller</button>
-    <button onclick="reportIssue()" class="btn-red w-full mt-2 hidden" id="disputeBtn">Report Problem</button>
-    <p id="payMsg" class="text-center text-sm mt-2"></p>
-  </div>
+<body>
+<div class="wrap">
+<div class="nav"><div class="logo"><svg width="36" height="36" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="#151A30" stroke="#FFD84D" stroke-width="4"/><rect x="34" y="46" width="32" height="24" rx="6" fill="#FFD84D"/><circle cx="50" cy="58" r="5" fill="#000"/></svg>Safe<span>Trade</span></div><div class="badge-live"><i></i> ESCROW LIVE</div></div>
+<div id="app"></div>
 </div>
-
-<!-- ADMIN SITE - ONLY SHOWS WHEN ?admin -->
-<div id="adminSite" class="hidden">
-  <h1 class="text-2xl font-black mt-2">🛡️ Admin <span class="gold">Dashboard</span></h1>
-  <p class="text-gray-400 text-sm">Private - Do not share this link</p>
-  <button onclick="adminLogin()" id="adminLoginBtn" class="btn-gold mt-4">Login With Google (Admin Only)</button>
-  <p id="adminMsg" class="text-sm mt-2"></p>
-  <div id="adminList" class="mt-4 space-y-3"></div>
-</div>
-
-<script>
-// === FIREBASE CONFIG - YOURS ===
-const firebaseConfig = {
-  apiKey: "AIzaSyDibL7nsZv_s7aokIE8jRZTQ9BvzZMA-pE",
-  authDomain: "safetrade-46ecb.firebaseapp.com",
-  projectId: "safetrade-46ecb",
-  storageBucket: "safetrade-46ecb.firebasestorage.app",
-  messagingSenderId: "306044200789",
-  appId: "1:306044200789:web:3225f3c95e616b014d31dc",
-  measurementId: "G-SLN7R62RJY"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
-const ADMIN_UID = "GUAcd6kJxeRxO7W8E4LaZiNij2t2";
-let currentDeal = null, currentDealPath = null, currentLink = "";
-
-// === CHECK IF ADMIN MODE ===
-const isAdminMode = window.location.search.includes("admin");
-if(isAdminMode){
-  document.getElementById("mainSite").style.display = "none";
-  document.getElementById("adminSite").classList.remove("hidden");
-  document.title = "SafeTrade Admin";
+<div id="toast"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const CFG = {apiKey:"AIzaSyDibL7nsZv_s7aokIE8jRZTQ9BvzZMA-pE",authDomain:"safetrade-46ecb.firebaseapp.com",projectId:"safetrade-46ecb",storageBucket:"safetrade-46ecb.firebasestorage.app",messagingSenderId:"306044200789",appId:"1:306044200789:web:3225f3c95e616b014d31dc"};
+const PAYSTACK_PK = "pk_test_84fc3f60a592f740e64594031fafa6a08ffad240";
+const FN = "/.netlify/functions/";
+const app = initializeApp(CFG);
+const db = getFirestore(app);
+const Q = new URLSearchParams(location.search);
+const PAY = (Q.get("pay")||"").match(/^(0\d{10})\.([A-Za-z0-9]{20})$/);
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const N = n=>"₦"+Number(n).toLocaleString();
+const toast = m=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",3500);};
+async function call(n,body){const r=await fetch(FN+n,{method:body?"POST":"GET",headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});const j=await r.json().catch(()=>({}));if(!r.ok) throw new Error(j.error||"Failed");return j;}
+const FALLBACK=[["Access Bank","044"],["Fidelity Bank","070"],["First Bank","011"],["GTBank","058"],["Kuda","50211"],["Moniepoint","50515"],["OPay","999992"],["PalmPay","999991"],["UBA","033"],["Zenith Bank","057"]].map(x=>({name:x[0],code:x[1]}));
+let banks=null,currentDeal=null;
+const dealLink=(p,i)=>location.origin+"/?pay="+p+"."+i;
+function hero(){
+ return `<div class="hero-card"><div class="kicker">Trusted by 1,200+ sellers in Nigeria</div><h1>Sell anything with <em>zero risk.</em></h1><p>We hold the buyer's money until they confirm delivery. You get paid instantly after. No stories.</p><div class="stats"><div class="stat"><b>₦3.2M+</b><span>Secured</span></div><div class="stat"><b>97%</b><span>You keep</span></div><div class="stat"><b>< 2 min</b><span>Payout</span></div></div><div class="steps"><div class="step"><span>🔒</span><b>Create Link</b></div><div class="step"><span>💳</span><b>Buyer Pays</b></div><div class="step"><span>🚀</span><b>You Get Paid</b></div></div></div>`;
 }
-
-async function adminLogin(){
-  try{
-    const provider = new firebase.auth.GoogleAuthProvider();
-    const res = await auth.signInWithPopup(provider);
-    if(res.user.uid !== ADMIN_UID){ document.getElementById("adminMsg").innerText = "❌ Not admin account"; await auth.signOut(); return; }
-    document.getElementById("adminMsg").innerText = "✅ Welcome Admin - Loading deals...";
-    document.getElementById("adminLoginBtn").style.display="none";
-    loadAdminDeals();
-  }catch(e){ document.getElementById("adminMsg").innerText = "Login error: "+e.message; }
+function shell(inner){ document.getElementById("app").innerHTML = hero() + inner; }
+async function sellView(done){
+ if(!banks){try{const l=await call("banks");banks=Array.isArray(l)&&l.length?l:FALLBACK;}catch{ banks=FALLBACK;}}
+ if(done){
+  const link=dealLink(done.phone,done.id);
+  const wa="https://wa.me/?text="+encodeURIComponent("Pay safely via SafeTrade (escrow): "+link);
+  const h=`<div class="card" style="text-align:center"><div style="font-size:48px">✅</div><h3 style="justify-content:center;margin-top:8px">Deal created & verified</h3><div class="sub">Account verified: <b style="color:var(--tx)">${esc(done.accountName)}</b> - buyer will see this badge.</div><div class="link-box"><input readonly id="lk" value="${esc(link)}"><button class="btn gold" style="width:auto;padding:12px 18px" data-a="copy">Copy</button></div><a href="${wa}" target="_blank" class="btn wa" style="margin-top:10px">💬 Share on WhatsApp</a><button class="btn ghost" data-a="again" style="margin-top:10px">Create another deal</button></div>`;
+  shell(h);
+ } else {
+  const opts=banks.map(b=>`<option value="${esc(b.code)}">${esc(b.name)}</option>`).join("");
+  const h2=`<div class="card"><h3>🔒 Create a Safe Deal</h3><div class="sub">Your bank is verified by Paystack. Buyers pay into escrow, not directly to you.</div><label>What are you selling?</label><input id="item" placeholder="e.g. iPhone 13 128GB - Neat" maxlength="90"><div class="grid2"><div><label>Price (₦)</label><input id="am" type="number" min="1000" placeholder="50000"></div><div><label>You will receive</label><div class="fee-box" id="fee"><span>Enter price - 97% after fee</span></div></div></div><div class="grid2"><div><label>Your name</label><input id="sn" placeholder="Michael Umoru"></div><div><label>Your WhatsApp phone</label><input id="sp" placeholder="08012345678"></div></div><label>Your bank</label><select id="bk"><option value="">Choose bank</option>${opts}</select><label>Account number (10 digits)</label><input id="ac" maxlength="10" placeholder="0123456789"><div class="verify-box v-idle" id="ai">Enter 10-digit account number to verify</div><div class="err" id="msg"></div><button class="btn gold" data-a="create">✨ CREATE DEAL LINK</button><p style="text-align:center;color:var(--mu);font-size:11px;margin-top:10px">Secured by Paystack • Verified banks • Escrow protection</p></div>`;
+  shell(h2);
+ }
 }
-auth.onAuthStateChanged(u=>{
-  if(isAdminMode && u && u.uid===ADMIN_UID){
-    document.getElementById("adminLoginBtn").style.display="none";
-    loadAdminDeals();
-  }
-});
-async function loadAdminDeals(){
-  const snap = await db.collectionGroup("deals").orderBy("createdAt","desc").limit(50).get();
-  let html = "";
-  if(snap.empty) html = "<p>No deals yet</p>";
-  snap.forEach(doc=>{
-    const d = doc.data();
-    html += `<div class="card p-4">
-      <p class="font-bold">${d.item||""} - ₦${(d.amount||0).toLocaleString()}</p>
-      <p class="text-xs text-gray-400">Seller: ${d.sellerName||""} (${d.sellerPhone||""}) | Buyer: ${d.buyerName||"-"}</p>
-      <p class="text-xs">Status: <b class="text-yellow-300">${d.status}</b> | Ref: ${d.paystackRef||""}</p>
-      <div class="flex gap-2 mt-2">
-        <button onclick="adminAction('${doc.ref.path}','release')" class="btn-green flex-1">Release</button>
-        <button onclick="adminAction('${doc.ref.path}','refund')" class="btn-red flex-1">Refund</button>
-      </div>
-    </div>`;
-  });
-  document.getElementById("adminList").innerHTML = html;
-}
-async function adminAction(path, action){
-  if(!confirm("Are you sure you want to "+action+" this deal?")) return;
-  const res = await fetch("/.netlify/functions/admin-action", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({path, action})});
-  const j = await res.json();
-  alert(j.message || "Done");
-  loadAdminDeals();
-}
-
-// === NORMAL FUNCTIONS (Create / Pay) ===
 async function createDeal(){
-  const item=document.getElementById("item").value.trim();
-  const amount=parseInt(document.getElementById("amount").value);
-  const sellerName=document.getElementById("sellerName").value.trim();
-  const sellerPhone=document.getElementById("sellerPhone").value.trim();
-  const bankCode=document.getElementById("bankCode").value;
-  const account=document.getElementById("account").value.trim();
-  if(!item||!amount||!sellerName||sellerPhone.length!==11||!bankCode||account.length!==10){ document.getElementById("createMsg").innerText="❌ Fill all fields correctly"; return; }
-  document.getElementById("createBtn").innerText="Creating...";
-  try{
-    const res = await fetch("/.netlify/functions/create-deal", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({item, amount, sellerName, sellerPhone, bankCode, account})});
-    const j = await res.json();
-    if(!j.success) throw new Error(j.error||"Failed");
-    currentLink = window.location.origin + "/?deal=" + j.dealId + "&seller=" + sellerPhone;
-    document.getElementById("dealLink").innerText = currentLink;
-    document.getElementById("linkBox").classList.remove("hidden");
-    document.getElementById("createMsg").innerText="✅ Deal created!";
-  }catch(e){ document.getElementById("createMsg").innerText="❌ "+e.message; }
-  document.getElementById("createBtn").innerText="Create Secure Link →";
+ const g=i=>$(i).value.trim(); const m=$("#msg");
+ if(!$("#item").value.trim()||!$("#am").value||!$("#sn").value.trim()||!$("#sp").value.trim()||!$("#bk").value||!$("#ac").value){ m.textContent="Fill all fields"; return; }
+ m.textContent="Verifying account...";
+ try{ const r=await call("create-deal",{item:g("#item"),amount:Number(g("#am")),sellerName:g("#sn"),sellerPhone:g("#sp"),bankCode:$("#bk").value,account:g("#ac")}); sellView(r); }catch(e){ m.textContent=e.message; }
 }
-function copyLink(){ navigator.clipboard.writeText(currentLink); alert("Link copied!"); }
-
-// Load deal if ?deal= in URL
-const params = new URLSearchParams(window.location.search);
-if(params.get("deal")){
-  const dealId=params.get("deal"), seller=params.get("seller");
-  db.collection("sellers").doc(seller).collection("deals").doc(dealId).onSnapshot(doc=>{
-    if(!doc.exists) return;
-    currentDeal=doc.data(); currentDealPath=doc.ref.path;
-    document.getElementById("buyerBox").classList.remove("hidden");
-    document.getElementById("createBox").style.display="none";
-    document.getElementById("dealDetails").innerHTML = `<b>${currentDeal.item}</b><br>Price: ₦${currentDeal.amount.toLocaleString()}<br>Seller: ${currentDeal.sellerName}<br>Status: <b>${currentDeal.status}</b>`;
-    if(currentDeal.status==="HOLDING"){
-      document.getElementById("receivedBtn").classList.remove("hidden");
-      document.getElementById("disputeBtn").classList.remove("hidden");
-    }
-  });
+let rseq=0,rt;
+function resolveAcct(){
+ clearTimeout(rt); const ac=$("#ac")?.value||"",bk=$("#bk")?.value||"",box=$("#ai"); if(!box) return;
+ if(ac.length!==10||!bk){ box.className="verify-box v-idle"; box.textContent="Enter 10-digit account number to verify"; return; }
+ box.className="verify-box v-idle"; box.textContent="Checking with bank..."; const my=++rseq;
+ rt=setTimeout(async()=>{ try{ const r=await call("resolve-account",{account:ac,bankCode:bk}); if(my!==rseq) return; if(r.ok){ box.className="verify-box v-ok"; box.textContent="✅ VERIFIED - "+r.accountName; } else{ box.className="verify-box v-bad"; box.textContent="❌ "+(r.error||"Could not verify"); } }catch(e){ if(my===rseq){ box.className="verify-box v-bad"; box.textContent=e.message; } } },400);
 }
-async function payNow(){
-  const buyerName=document.getElementById("buyerName").value.trim();
-  const buyerPhone=document.getElementById("buyerPhone").value.trim();
-  const buyerEmail=document.getElementById("buyerEmail").value.trim();
-  if(!buyerName||!buyerEmail){ document.getElementById("payMsg").innerText="Fill buyer details"; return; }
-  const handler = PaystackPop.setup({
-    key: "pk_test_84fc3f60a592f740e64594031fafa6a08ffad240",
-    email: buyerEmail,
-    amount: currentDeal.amount * 100,
-    currency: "NGN",
-    callback: async function(resp){
-      await fetch("/.netlify/functions/verify-payment", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({reference: resp.reference, path: currentDealPath, buyerName, buyerPhone, buyerEmail})});
-      document.getElementById("payMsg").innerText="✅ Payment held in escrow!";
-      location.reload();
-    },
-    onClose: function(){ document.getElementById("payMsg").innerText="Payment cancelled"; }
-  });
-  handler.openIframe();
+function payView(d){
+ currentDeal=d;
+ if(!d){ shell('<div class="card"><h3>Deal not found - check link</h3><p class="sub">The link may be expired or wrong.</p></div>'); return; }
+ const S=d.status; let body="",badge="";
+ if(S==="AWAITING_PAYMENT"){
+  badge=`<span class="status-badge s-await">⏳ Awaiting Payment</span>`;
+  body=`<div class="fee-box"><span>Seller verified: <b>${esc(d.accountName)}</b> • Escrow protected • ${N(d.amount)}</span></div><label>Your full name</label><input id="bn" placeholder="Your name"><label>Your phone</label><input id="bp" placeholder="080..."><label>Your email (for receipt)</label><input id="be" type="email" placeholder="you@email.com"><div class="err" id="msg"></div><button class="btn gold" data-a="pay">🔒 PAY ${N(d.amount)} SAFELY</button><p style="text-align:center;color:var(--mu);font-size:11px;margin-top:10px">Money goes to SafeTrade escrow. Seller only gets paid after you confirm.</p>`;
+ } else if(S==="HOLDING"){
+  badge=`<span class="status-badge s-hold">✅ Payment Held in Escrow</span>`;
+  const waNum=d.sellerPhone.startsWith("0")?"234"+d.sellerPhone.slice(1):d.sellerPhone;
+  const waText=encodeURIComponent("SafeTrade: I just paid "+N(d.amount)+" for "+d.item+". Please confirm and deliver. Link: "+dealLink(d.sellerPhone,d.id));
+  const waLink="https://wa.me/"+waNum+"?text="+waText;
+  body=`<div class="note n-ok">💰 <b>${N(d.amount)}</b> is safely held by SafeTrade. Seller has NOT been paid yet. Seller will be paid only after you click "I received it".</div><a href="${waLink}" target="_blank" class="btn wa">💬 Notify Seller on WhatsApp</a><div style="margin-top:14px"><button class="btn green" data-a="rel">✅ I received it - Pay seller now</button><button class="btn red" data-a="dsp" style="margin-top:8px">🚩 Report problem / Scam</button></div>`;
+ } else if(S==="RELEASED"){
+  badge=`<span class="status-badge s-rel">✅ Seller Paid - Complete</span>`;
+  body=`<div class="note n-ok">This deal is complete. Seller has been paid ${N(d.payout||d.amount)}.</div>`;
+ } else { badge=`<span class="status-badge s-await">${esc(S)}</span>`; body=`<div class="note">Status: ${esc(S)} - Contact support if stuck.</div>`; }
+ const inner=`<div class="card">${badge}<h3 style="font-size:22px;margin-top:6px">${esc(d.item)}</h3><div class="sub">Seller: ${esc(d.sellerName)} • Verified account: <b style="color:var(--ok)">${esc(d.accountName)}</b> • ${N(d.amount)}</div>${body}</div>`;
+ shell(inner);
 }
-async function markReceived(){ await fetch("/.netlify/functions/release-funds", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({path: currentDealPath})}); alert("Release requested - seller will be paid"); location.reload(); }
-async function reportIssue(){ await db.doc(currentDealPath).update({status:"DISPUTED"}); alert("Dispute reported. Money locked. Admin will review."); location.reload(); }
-
-// Bank verification
-document.getElementById("account")?.addEventListener("input", async e=>{
-  const acc=e.target.value; const bank=document.getElementById("bankCode").value;
-  if(acc.length===10 && bank){
-    document.getElementById("accountName").innerText="Verifying...";
-    try{
-      const r=await fetch("/.netlify/functions/verify-bank?account="+acc+"&bank="+bank);
-      const j=await r.json(); document.getElementById("accountName").innerText = j.account_name ? "✅ "+j.account_name : "❌ Could not verify";
-    }catch{ document.getElementById("accountName").innerText=""; }
-  }
-});
+async function handlePay(){
+ const d=currentDeal; if(!d) return;
+ const bn=$("#bn").value.trim(),bp=$("#bp").value.trim(),be=$("#be").value.trim(),msg=$("#msg");
+ if(!bn||!bp||!be){ msg.textContent="Fill all buyer fields"; return; }
+ msg.textContent="Opening Paystack secure checkout...";
+ const handler=PaystackPop.setup({key:PAYSTACK_PK,email:be,amount:d.amount*100,currency:"NGN",ref:""+Date.now(),callback:async function(res){try{msg.textContent="Confirming payment...";await updateDoc(doc(db,"sellers",d.sellerPhone,"deals",d.id),{status:"HOLDING",buyerName:bn,buyerPhone:bp,buyerEmail:be,paystackRef:res.reference,paidAt:new Date()});toast("Payment secured in escrow");payView({...d,status:"HOLDING"});}catch(e){ msg.textContent=e.message; }},onClose:()=>{ msg.textContent="Payment cancelled"; }});
+ handler.openIframe();
+}
+async function handleRelease(btn){
+ const d=currentDeal; if(!d) return;
+ if(!confirm("You confirm you RECEIVED the item in good condition? This will PAY the seller instantly and cannot be reversed.")) return;
+ const orig=btn.textContent; btn.textContent="Paying seller..."; btn.disabled=true;
+ try{ const res=await fetch(FN+"release-funds",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sellerPhone:d.sellerPhone,dealId:d.id,amount:d.amount,bankCode:d.bankCode,accountNumber:d.accountNumber||d.account,sellerName:d.sellerName,accountName:d.accountName})}); const j=await res.json(); if(!j.ok) throw new Error(j.error||"Payout failed"); await updateDoc(doc(db,"sellers",d.sellerPhone,"deals",d.id),{status:"RELEASED",releasedAt:new Date(),payout:j.payout}); toast("Paid seller "+N(j.payout)); payView({...d,status:"RELEASED",payout:j.payout}); }catch(e){ toast(e.message); btn.textContent=orig; btn.disabled=false; }
+}
+document.addEventListener("click",async(e)=>{ const t=e.target.closest("[data-a]"); if(!t) return; const a=t.dataset.a; if(a==="again") sellView(); if(a==="create") createDeal(); if(a==="copy"){const el=$("#lk");el.select();el.setSelectionRange(0,9999);navigator.clipboard.writeText(el.value);toast("Link copied"); } if(a==="pay") handlePay(); if(a==="rel") handleRelease(t); if(a==="dsp"){ if(confirm("Report this deal? Money will stay locked and support will review.")){ try{ await updateDoc(doc(db,"sellers",currentDeal.sellerPhone,"deals",currentDeal.id),{status:"DISPUTED"}); toast("Reported - money locked"); payView({...currentDeal,status:"DISPUTED"});}catch(err){toast(err.message);} } } });
+document.addEventListener("input",(e)=>{ if(e.target.id==="ac"||e.target.id==="bk") resolveAcct(); if(e.target.id==="am"){const v=Number(e.target.value||0);const el=$("#fee");if(el) el.innerHTML=v?`<span>You receive: <b>${N(v - v*0.03)}</b> (3% fee)</span>`:`<span>Enter price - 97% after fee</span>`;} });
+if(PAY){ try{ const snap=await getDoc(doc(db,"sellers",PAY[1],"deals",PAY[2])); if(snap.exists()) payView({id:snap.id,...snap.data()}); else payView(null); }catch{ payView(null); } } else { sellView(); }
 </script>
-
-<!-- === NETLIFY BADGE HIDER JS - DO NOT REMOVE === -->
 <script>
-(function(){
-  function hideBadge(){
-    document.querySelectorAll('iframe[src*="netlify"], div[data-netlify-badge], a[href*="netlify"], [class*="netlify-badge"]').forEach(el=>{ el.style.display='none'; el.remove(); });
-  }
-  hideBadge(); setInterval(hideBadge, 500);
-  new MutationObserver(hideBadge).observe(document.body, {childList:true, subtree:true});
-})();
+// HIDE NETLIFY BADGE - FREE FIX, NO UPGRADE NEEDED
+setInterval(()=>{
+  document.querySelectorAll('iframe, div, a, button').forEach(el=>{
+    try{
+      const html = (el.outerHTML||'').toLowerCase();
+      const txt = (el.textContent||'').toLowerCase();
+      if((html.includes('netlify') && html.includes('powered')) || txt.trim()==='powered by netlify'){
+        el.style.display='none';
+        el.remove();
+      }
+    }catch(e){}
+  });
+  const b = document.querySelector('[data-netlify-badge], #netlify-badge, .netlify-badge');
+  if(b) b.remove();
+}, 500);
 </script>
 </body>
-</html>
+  </html>
