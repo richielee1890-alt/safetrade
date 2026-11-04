@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src https://www.gstatic.com https://js.paystack.co 'sha256-LTv4tAkjWPIfqNTF7lmh3a29MqC1K2LyuHfQ7IVDs8Q='; style-src 'unsafe-inline'; img-src 'self' data:; media-src 'none'; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.paystack.co; frame-src https://checkout.paystack.com https://*.paystack.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<title>SafeTrade – Secure Escrow for Nigeria</title>
+<style>
+:root{--bg:#07080c;--card:#12141b;--line:#232734;--tx:#f3f4f7;--mu:#8b90a0;--gold:#FFD34D;--gold2:#D4AF37;--ok:#3ecf74;--bad:#ff5d5d;--blue:#4aa3ff;--warn:#ffa726;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4f5f8;--card:#fff;--line:#e1e4ec;--tx:#14161d;--mu:#5d6375;--gold:#9a7400;--gold2:#b8901a}}
+:root[data-theme="dark"]{--bg:#07080c}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+html,body{min-height:100%}body{background:var(--bg);color:var(--tx);padding:14px 14px 90px}
+.wrap{max-width:760px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px}.brand b{font-size:22px;letter-spacing:.5px}.brand b i{color:var(--gold);font-style:normal}
+.hero{text-align:center;padding:26px 0 10px}.hero .brand{justify-content:center;flex-direction:column;gap:8px}.hero p{color:var(--mu);font-size:13px;margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px}
+.card h3{font-size:16px;margin-bottom:8px}.card p,.mu{font-size:13px;color:var(--mu);line-height:1.55}
+.tabs{display:flex;background:var(--card);border:1px solid var(--line);border-radius:50px;padding:4px;margin:12px 0;overflow-x:auto}
+.tab{flex:1;white-space:nowrap;padding:11px 14px;border:0;background:transparent;color:var(--mu);font-weight:700;border-radius:50px;cursor:pointer;font-size:13px}
+.tab.on{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}
+input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--tx);margin-bottom:10px;font-size:15px;outline:none}
+input:focus,select:focus{border-color:var(--gold)}
+label{font-size:12px;color:var(--mu);display:block;margin-bottom:5px}
+.btn{width:100%;padding:14px;border:0;border-radius:50px;font-weight:800;font-size:15px;cursor:pointer;margin-top:6px;color:#fff}
+.gold{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}.green{background:var(--ok);color:#000}.blue{background:var(--blue);color:#000}.red{background:var(--bad)}.out{background:transparent;border:1px solid var(--line);color:var(--tx)}
+.btn.sm{padding:9px 12px;font-size:12px;width:auto;flex:1}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:12px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}.stat b{font-size:19px;color:var(--gold);display:block}.stat span{font-size:11px;color:var(--mu)}
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:800;margin-bottom:8px;color:#000}
+.HOLDING{background:var(--warn)}.DELIVERED{background:var(--blue)}.COMPLETED{background:var(--ok)}.DISPUTED{background:var(--bad);color:#fff}.REFUNDED{background:#b18cff}.suspended{background:var(--bad);color:#fff}.active{background:var(--ok)}
+.fee{background:rgba(212,175,55,.1);border:1px dashed var(--gold2);border-radius:12px;padding:12px;font-size:13px;line-height:1.6;margin:6px 0 10px}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-bottom:6px}.okm{color:var(--ok)}
+.meter{height:5px;border-radius:5px;background:var(--line);margin:-4px 0 10px;overflow:hidden}.meter i{display:block;height:100%;width:0;background:var(--bad);transition:.3s}
+.top{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.top .who{font-size:12px;color:var(--mu);text-align:right}.top button{background:none;border:1px solid var(--line);color:var(--tx);border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer;margin-left:6px}
+.tbl{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--mu)}
+.lnk{background:none;border:0;color:var(--gold);cursor:pointer;font-size:13px;margin-top:12px}
+#pinov{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:99;padding:20px}#pinov.on{display:flex}
+.pc{text-align:center;width:100%;max-width:300px}.pc h3{margin:12px 0}
+.dots{display:flex;gap:14px;justify-content:center;margin:14px 0}.dots i{width:14px;height:14px;border-radius:50%;border:2px solid var(--gold)}.dots i.f{background:var(--gold)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}.pad button{height:62px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--tx);font-size:22px;cursor:pointer}.pad button:active{background:var(--gold);color:#000}
+.shield{filter:drop-shadow(0 0 14px rgba(255,211,77,.35))}
+.sec{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.sec span{font-size:11px;border:1px solid var(--line);border-radius:20px;padding:4px 10px;color:var(--mu)}
+.PENDING_PAYMENT{background:var(--warn)}.PROOF_SUBMITTED{background:var(--warn)}.HOLDING{background:var(--ok)}.CONFIRMED{background:var(--blue)}.RELEASED{background:var(--ok)}.CANCELLED{background:var(--line);color:var(--tx)}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:8px 0}.chip{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}.chip.on{background:var(--gold);color:#000;border-color:var(--gold)}
+.post{background:var(--card);border:1px solid var(--line);border-radius:18px;margin-bottom:14px;overflow:hidden;cursor:pointer}
+.ph{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13px}.av{width:34px;height:34px;border-radius:50%;background:var(--line) center/cover;flex:none}
+.post img.m{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--line)}.pb{padding:12px 14px}.pb b{color:var(--gold);font-size:18px}
+.tick{color:#000;background:var(--ok);border-radius:20px;font-size:10px;font-weight:800;padding:2px 7px;margin-left:4px}
+.gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:6px;margin:10px 0;border-radius:14px}.gal>*{flex:0 0 100%;scroll-snap-align:center;max-height:60vh;object-fit:contain;background:#000;border-radius:14px}
+#md{position:fixed;inset:0;background:var(--bg);display:none;z-index:50;overflow-y:auto;padding:14px;padding-top:calc(14px + env(safe-area-inset-top,0px))}#md.on{display:block}#md .wrap{padding-bottom:90px}
+.msgs{display:flex;flex-direction:column;gap:6px;min-height:40vh;max-height:55vh;overflow-y:auto;margin-bottom:10px}.bub{max-width:80%;padding:9px 12px;border-radius:14px;font-size:14px;background:var(--card);border:1px solid var(--line);word-break:break-word}.bub.me{align-self:flex-end;background:var(--gold2);color:#000;border:0}
+.note{border-radius:12px;padding:11px;font-size:13px;line-height:1.5;margin:8px 0}.n-ok{background:rgba(62,207,116,.14);border:1px solid var(--ok)}.n-wait{background:rgba(255,167,38,.14);border:1px solid var(--warn)}
+.stars button{background:none;border:0;font-size:26px;cursor:pointer;color:var(--gold)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:30px;font-size:13px;z-index:200;display:none;max-width:90%}
+input[type=file]{padding:10px}textarea{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--tx);margin-bottom:10px;font-size:15px;min-height:80px}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.HOLDING{background:var(--ok)}
+
+.AWAITING_PAYMENT{background:var(--warn)}.PAYING_OUT{background:var(--blue)}.PAYOUT_FAILED{background:var(--bad);color:#fff}a.btn{display:block}
+</style>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1A8"/><stop offset=".5" stop-color="#FFD34D"/><stop offset="1" stop-color="#B8860B"/></linearGradient><linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2030"/><stop offset="1" stop-color="#07080c"/></linearGradient></defs></svg>
+<div class="wrap" id="app"></div>
+<div id="toast" role="status"></div>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {getFirestore,collection,collectionGroup,doc,onSnapshot} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const CFG={apiKey:"AIzaSyDibL7nsZv_s7aokIE8jRZTQ9BvzZMA-pE",authDomain:"safetrade-46ecb.firebaseapp.com",projectId:"safetrade-46ecb",storageBucket:"safetrade-46ecb.firebasestorage.app",messagingSenderId:"306044200789",appId:"1:306044200789:web:3225f3c95e616b014d31dc"};
+const PAYSTACK_PK='pk_test_84fc3f60a592f740e64594031fafa6a08ffad240'; // public key only
+const FN='/.netlify/functions/',FEE=.03;
+const app=initializeApp(CFG),auth=getAuth(app),db=getFirestore(app);
+const Q=new URLSearchParams(location.search),ADMIN=Q.get('admin')==='1',PAY=(Q.get('pay')||'').match(/^(0\d{10})\.([A-Za-z0-9]{20})$/);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const N=n=>'₦'+Number(n).toLocaleString();
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',4500)};
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+const sha=async s=>hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)));
+async function call(n,body){const r=await fetch(FN+n,{method:body?'POST':'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed ('+r.status+')');return j}
+const LOGO=s=>`<svg class="shield" width="${s}" height="${s}" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="url(#gd)" stroke="url(#gg)" stroke-width="4" stroke-linejoin="round"/><rect x="34" y="46" width="32" height="24" rx="5" fill="url(#gg)"/><path d="M39 46v-8a11 11 0 0 1 22 0v8" fill="none" stroke="url(#gg)" stroke-width="5" stroke-linecap="round"/></svg>`;
+const BRAND=`<div class="brand">${LOGO(40)}<b>Safe<i>Trade</i></b></div>`;
+const LBL={AWAITING_PAYMENT:'⏳ AWAITING PAYMENT',HOLDING:'💰 HOLDING',PAYING_OUT:'🏦 PAYING SELLER',RELEASED:'🎉 SELLER PAID',DISPUTED:'⚠️ DISPUTED',PAYOUT_FAILED:'⚠️ PAYOUT RETRY',REFUNDED:'↩️ REFUNDED',CANCELLED:'CANCELLED'};
+const badge=s=>`<span class="badge ${s}">${LBL[s]||esc(s)}</span>`;
+const FALLBACK=[['Access Bank','044'],['Citibank Nigeria','023'],['Ecobank Nigeria','050'],['Fidelity Bank','070'],['First Bank of Nigeria','011'],['First City Monument Bank (FCMB)','214'],['Globus Bank','00103'],['Guaranty Trust Bank (GTBank)','058'],['Heritage Bank','030'],['Jaiz Bank','301'],['Keystone Bank','082'],['Kuda Microfinance Bank','50211'],['Moniepoint MFB','50515'],['OPay','999992'],['PalmPay','999991'],['Parallex Bank','104'],['Polaris Bank','076'],['Providus Bank','101'],['Rubies MFB','125'],['Stanbic IBTC Bank','221'],['Standard Chartered Bank','068'],['Sterling Bank','232'],['TAJ Bank','302'],['Union Bank','032'],['United Bank for Africa (UBA)','033'],['Unity Bank','215'],['VFD Microfinance Bank','566'],['Wema Bank','035'],['Zenith Bank','057']].map(([name,code])=>({name,code}));
+let bankNote='',view='sell',off=null,deals=[],banks=null,paid=false,last=null;
+const link=(p,i)=>`${location.origin}/?pay=${p}.${i}`;
+function shell(inner,tabs){$('#app').innerHTML=`<div class="hero" style="padding-bottom:0">${BRAND}<p>${ADMIN?'Administrator console':'We hold the buyer\'s money until the goods arrive. Then the seller is paid automatically.'}</p></div>`+(tabs?`<div class="tabs"><button class="tab ${view==='sell'?'on':''}" data-a="v" data-v="sell">Sell (create deal)</button><button class="tab ${view==='seller'?'on':''}" data-a="v" data-v="seller">My deals</button></div>`:'')+inner}
+
+/* ---------- SELLER: create deal ---------- */
+async function sellView(done){
+  if(!banks){try{const l=await Promise.race([call('banks'),new Promise((_,j)=>setTimeout(()=>j(new Error('timeout')),7000))]);banks=Array.isArray(l)&&l.length?l:null}catch(e){banks=null}if(!banks){banks=FALLBACK;bankNote='Showing our list of common banks. If yours is missing, contact SafeTrade.'}}
+  shell(done?`<div class="card" style="text-align:center"><div style="font-size:44px">🔗</div><h3>Deal created</h3><p>Verified account: <b>${esc(done.accountName)}</b><br>Send this link to your buyer. They pay SafeTrade; we hold it.</p><br><input readonly id="lk" value="${esc(link(done.phone,done.id))}"><button class="btn gold" data-a="copy">Copy link</button><a class="btn green" style="display:block;text-align:center;text-decoration:none" href="https://wa.me/?text=${encodeURIComponent('Pay safely through SafeTrade: '+link(done.phone,done.id))}" target="_blank" rel="noopener">Share on WhatsApp</a></div>`:
+  `<div class="card"><h3>🔒 Create a Safe Deal</h3><p>You are the seller. Enter where you want to be paid. Money is sent to this account automatically after the buyer confirms delivery.</p><br><label>What are you selling?</label><input id="item" maxlength="80"><label>Price (₦)</label><input id="am" type="number" min="1000" max="50000000"><div class="fee" id="fee">Enter price to see what you receive</div><label>Your name</label><input id="sn" maxlength="60"><label>Your phone</label><input id="sp" inputmode="numeric" maxlength="11" placeholder="08012345678"><label>Your bank</label><select id="bk"><option value="">Choose bank</option>${banks.map(b=>`<option value="${esc(b.code)}">${esc(b.name)}</option>`).join('')}</select>${bankNote?`<p class="mu">${esc(bankNote)}</p>`:''}<label>Account number</label><input id="ac" inputmode="numeric" maxlength="10"><p class="err" id="msg"></p><button class="btn gold" data-a="create">CREATE DEAL LINK</button></div>`,true);
+}
+async function createDeal(){
+  const g=i=>$(i).value.trim(),m=$('#msg');m.textContent='Verifying your bank account…';
+  try{const r=await call('create-deal',{item:g('#item'),amount:Number(g('#am')),sellerName:g('#sn'),sellerPhone:g('#sp'),bankCode:$('#bk').value,account:g('#ac')});sellView(r)}catch(e){m.textContent=e.message}
+}
+/* ---------- SELLER: my deals ---------- */
+function sellerView(list,phone){
+  shell(`<div class="card"><h3>📦 My deals</h3><input id="lp" inputmode="numeric" maxlength="11" placeholder="Your phone, 08012345678" value="${esc(phone||'')}"><button class="btn gold" data-a="find">SHOW MY DEALS</button><p class="err" id="msg"></p></div>`+(list?list.map(d=>{const S=d.status;return `<div class="card">${badge(S)}<h3>${esc(d.item)}</h3><p>${N(d.amount)} · you receive <b>${N(d.amount-d.fee)}</b>${d.buyerName?`<br>Buyer: ${esc(d.buyerName)}`:''}</p>${S==='AWAITING_PAYMENT'?`<div class="note n-wait">⏳ Buyer has not paid. Do not deliver.</div><input readonly value="${esc(link(d.sellerPhone,d.id))}">`:S==='HOLDING'?'<div class="note n-ok">✅ <b>Payment confirmed automatically.</b> SafeTrade holds the money. Deliver now. When the buyer confirms, you are paid.</div>':S==='PAYING_OUT'?'<div class="note n-ok">🏦 Buyer confirmed. Your payout is on its way.</div>':S==='RELEASED'?'<div class="note n-ok">🎉 Paid to your account.</div>':S==='DISPUTED'||S==='PAYOUT_FAILED'?'<div class="note n-wait">SafeTrade is handling this. No action needed.</div>':'<div class="note n-wait">Closed.</div>'}</div>`}).join('')||'<div class="card"><p>No deals for this number.</p></div>':''),true);
+}
+function findDeals(){
+  const p=$('#lp').value.trim();if(!/^0\d{10}$/.test(p))return $('#msg').textContent='Enter 11 digits.';off&&off();
+  off=onSnapshot(collection(db,'sellers',p,'deals'),s=>{sellerView(s.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)),p)},e=>{sellerView(null,p);$('#msg').textContent=e.code||e.message});
+}
+/* ---------- BUYER: pay link ---------- */
+function payView(d){
+  const id=PAY[2],S=d&&d.status,key='st_t_'+id,tok=localStorage.getItem(key);
+  if(!d)return shell('<div class="card"><h3>Deal not found</h3><p>Check the link you were sent.</p></div>');
+  let body='';
+  if(S==='AWAITING_PAYMENT')body=`<div class="fee">Seller account verified: <b>${esc(d.accountName)}</b> (…${esc(d.acctLast4)})<br>Item: <b>${esc(d.item)}</b><br>Total to pay: <b>${N(d.amount)}</b></div><label>Your name</label><input id="bn" maxlength="60"><label>Your phone</label><input id="bp" inputmode="numeric" maxlength="11"><label>Your email</label><input id="be" type="email" maxlength="80"><p class="err" id="msg"></p><button class="btn gold" data-a="pay">💳 PAY SAFELY (card / transfer)</button>`;
+  else if(S==='HOLDING')body=`<div class="note n-ok">💰 Payment received. SafeTrade holds ${N(d.amount)}. Wait for the seller to deliver.</div>${tok?`<p class="mu">Only press the green button AFTER you receive and check the item. It pays the seller immediately and cannot be undone.</p><button class="btn green" data-a="rel">✅ I received it – pay the seller</button><button class="btn red" data-a="dsp">⚠️ Report a problem</button><p class="mu" style="margin-top:10px">Your release code (keep private): <b>${esc(tok)}</b></p>`:`<label>Release code (saved on the phone you paid with)</label><input id="rc"><button class="btn green" data-a="rel">✅ I received it – pay the seller</button><button class="btn red" data-a="dsp">⚠️ Report a problem</button>`}`;
+  else if(S==='PAYING_OUT'||S==='RELEASED')body='<div class="note n-ok">🎉 Thank you. The seller has been paid. Deal complete.</div>';
+  else if(S==='DISPUTED'||S==='PAYOUT_FAILED')body='<div class="note n-wait">SafeTrade is reviewing this deal. Your money stays safe.</div>';
+  else body=`<div class="note n-wait">This deal is ${esc(LBL[S]||S)}.</div>`;
+  shell(`<div class="card">${badge(S)}<h3>${esc(d.item)}</h3><p>Seller: ${esc(d.sellerName)}</p>${body}</div>`);
+}
+async function startPay(){
+  const g=i=>$(i).value.trim(),m=$('#msg'),d=last;
+  if(g('#bn').length<2)return m.textContent='Enter your name.';
+  if(!/^0\d{10}$/.test(g('#bp')))return m.textContent='Phone must be 11 digits.';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(g('#be')))return m.textContent='Enter a valid email.';
+  if(!window.PaystackPop)return m.textContent='Payment system did not load. Refresh.';
+  const t=hex(crypto.getRandomValues(new Uint8Array(12))),th=await sha(t);localStorage.setItem('st_t_'+PAY[2],t);paid=false;
+  window.PaystackPop.setup({key:PAYSTACK_PK,email:g('#be'),amount:d.amount*100,currency:'NGN',ref:'ST'+Date.now()+Math.floor(Math.random()*1e6),channels:['card','bank','bank_transfer','ussd'],
+    metadata:{path:`sellers/${PAY[1]}/deals/${PAY[2]}`,buyerName:g('#bn'),buyerPhone:g('#bp'),tokenHash:th},
+    callback:function(){paid=true;toast('Payment received. Confirming automatically…')},
+    onClose:function(){setTimeout(()=>{if(!paid)toast('Payment cancelled')},400)}}).openIframe();
+}
+async function buyerAct(action){
+  const tok=localStorage.getItem('st_t_'+PAY[2])||($('#rc')&&$('#rc').value.trim());if(!tok)return toast('Enter your release code.');
+  if(!confirm(action==='release'?'Pay the seller now? This cannot be undone.':'Report a problem and freeze this deal?'))return;
+  try{await call('buyer-action',{path:`sellers/${PAY[1]}/deals/${PAY[2]}`,token:tok,action});toast(action==='release'?'Seller is being paid ✅':'Reported. SafeTrade will review.')}catch(e){toast(e.message)}
+}
+/* ---------- ADMIN ---------- */
+function adminLogin(msg){shell(`<div class="card"><h3>🛡️ Admin sign in</h3><label>Admin email</label><input id="ae" type="email" autocomplete="username"><label>Password</label><input id="ap" type="password" autocomplete="current-password"><button class="btn gold" data-a="alogin">SIGN IN</button><p class="err" id="msg" style="margin-top:10px">${esc(msg||'')}</p></div>`)}
+function adminView(){
+  const held=deals.filter(d=>d.status==='HOLDING').reduce((s,d)=>s+d.amount,0),att=deals.filter(d=>['DISPUTED','PAYOUT_FAILED'].includes(d.status)).length;
+  shell(`<div class="top"><span></span><button class="lnk" data-a="aout">Sign out</button></div><div class="note n-ok">Payments are confirmed and sellers are paid automatically. You only step in for disputes and failed payouts.</div><div class="stats"><div class="stat"><b>${deals.length}</b><span>Deals</span></div><div class="stat"><b>${att}</b><span>Need you</span></div><div class="stat"><b>${N(held)}</b><span>Holding</span></div></div>`+
+  deals.map(d=>{const S=d.status,x=['HOLDING','DISPUTED','PAYOUT_FAILED'].includes(S),b=a=>`data-a="adm" data-p="${esc(d.path)}" data-v="${a}"`;return `<div class="card">${badge(S)}<h3>${esc(d.item)}</h3><p>Buyer: ${esc(d.buyerName||'-')}<br>Seller: ${esc(d.sellerName)} (${esc(d.sellerPhone)}) · ${esc(d.accountName)} …${esc(d.acctLast4)}<br>${N(d.amount)} · fee ${N(d.fee)} · payout ${N(d.amount-d.fee)}<br>Paystack ref: ${esc(d.payRef||'-')}${d.payoutError?`<br><span style="color:var(--bad)">${esc(d.payoutError)}</span>`:''}</p><div class="row" style="margin-top:8px">${x?`<button class="btn sm green" ${b('release')}>RELEASE</button><button class="btn sm out" ${b('refund')}>REFUND</button>`:''}${S==='AWAITING_PAYMENT'?`<button class="btn sm red" ${b('cancel')}>CANCEL</button>`:''}</div></div>`}).join('')||'<div class="card"><p>No deals yet.</p></div>');
+}
+onAuthStateChanged(auth,u=>{
+  if(!ADMIN)return;off&&off();if(!u)return adminLogin();
+  off=onSnapshot(collectionGroup(db,'deals'),s=>{deals=s.docs.map(x=>({id:x.id,path:x.ref.path,...x.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));adminView()},e=>adminLogin('Not authorised ('+(e.code||e.message)+'). Check the admin UID in your Firestore rules.'));
+});
+/* ---------- EVENTS ---------- */
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a;
+  try{
+    if(a==='v'){off&&off();off=null;view=b.dataset.v;return view==='sell'?sellView():sellerView()}
+    if(a==='create')return createDeal();if(a==='find')return findDeals();if(a==='pay')return startPay();
+    if(a==='copy'){$('#lk').select();try{await navigator.clipboard.writeText($('#lk').value)}catch(x){}return toast('Link copied')}
+    if(a==='rel')return buyerAct('release');if(a==='dsp')return buyerAct('dispute');
+    if(a==='alogin'){try{await signInWithEmailAndPassword(auth,$('#ae').value.trim().toLowerCase(),$('#ap').value)}catch(x){adminLogin('Sign-in failed ('+(x.code||x.message)+')')}return}
+    if(a==='aout'){off&&off();return signOut(auth)}
+    if(a==='adm'){const v=b.dataset.v;if(!confirm(v.toUpperCase()+' this deal?'))return;await call('admin-action',{path:b.dataset.p,action:v,idToken:await auth.currentUser.getIdToken()});return toast('Done: '+v)}
+  }catch(x){toast(x.message||'Error')}
+});
+document.addEventListener('input',e=>{const t=e.target;
+  if(['sp','bp','lp','ac'].includes(t.id))t.value=t.value.replace(/\D/g,'');
+  if(t.id==='am'){const n=Number(t.value)||0,f=Math.round(n*FEE);$('#fee').innerHTML=n?`Price: <b>${N(n)}</b><br>SafeTrade fee (3%): <b>${N(f)}</b><br>You receive: <b>${N(n-f)}</b>`:'Enter price to see what you receive'}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='ap')document.querySelector('[data-a=alogin]').click()});
+if(ADMIN)adminLogin();
+else if(PAY){shell('<div class="card"><p>Loading deal…</p></div>');onSnapshot(doc(db,'sellers',PAY[1],'deals',PAY[2]),s=>{last=s.exists()?{id:s.id,...s.data()}:null;payView(last)},()=>payView(null))}
+else sellView();
+</script>
+</body>
+</html>
