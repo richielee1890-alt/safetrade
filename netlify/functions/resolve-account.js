@@ -1,12 +1,42 @@
-const {ps, J} = require('./_lib');
-exports.handler = async ev => {
-  if (ev.httpMethod !== 'POST') return J(405, {error: 'POST only'});
-  let b; try { b = JSON.parse(ev.body); } catch (e) { return J(400, {error: 'Bad request'}); }
-  const acct = String(b.account || ''), bank = String(b.bankCode || '');
-  if (!/^\d{10}$/.test(acct) || !/^\d{2,6}$/.test(bank)) return J(400, {error: 'Bad request'});
+exports.handler = async (event) => {
   try {
-    const r = await ps('GET', `/bank/resolve?account_number=${acct}&bank_code=${bank}`);
-    if (r.status && r.data) return J(200, {ok: true, accountName: r.data.account_name});
-    return J(200, {ok: false, error: r.message || 'Could not verify this account.', manual: process.env.ALLOW_MANUAL_NAME === '1'});
-  } catch (e) { return J(200, {ok: false, error: 'Could not reach Paystack: ' + e.message, manual: false}); }
+    // No Firebase needed for this function - only Paystack
+    if (!process.env.PAYSTACK_SECRET_KEY) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "PAYSTACK_SECRET_KEY missing in Netlify env vars" })
+      };
+    }
+
+    const body = JSON.parse(event.body || "{}");
+    const account_number = body.account_number || body.accountNumber;
+    const bank_code = body.bank_code || body.bankCode;
+
+    if (!account_number || !bank_code) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "account_number and bank_code required" })
+      };
+    }
+
+    const res = await fetch(`https://api.paystack.co/bank/resolve?account_number=${account_number}&bank_code=${bank_code}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    const data = await res.json();
+    
+    return {
+      statusCode: res.status,
+      body: JSON.stringify(data)
+    };
+
+  } catch (err) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
+  }
 };
