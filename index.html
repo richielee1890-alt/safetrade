@@ -10,90 +10,80 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <style>
-  /* === NETLIFY BADGE HIDER - CSS PART - DO NOT REMOVE === */
-  iframe[src*="netlify"], div[data-netlify-badge]{ display:none !important; visibility:hidden !important; opacity:0 !important; pointer-events:none !important; }
-  .netlify-badge{ display:none !important; visibility:hidden !important; }
-  body{ background:#0a0a0f; color:white; font-family:system-ui, -apple-system, sans-serif; }
+  /* === NETLIFY BADGE HIDER - DO NOT REMOVE === */
+  iframe[src*="netlify"], div[data-netlify-badge], a[href*="netlify.app"]{ display:none !important; visibility:hidden !important; opacity:0 !important; pointer-events:none !important; }
+  .netlify-badge, [class*="netlify"]{ display:none !important; }
+  body{ background:#0a0a0f; color:white; font-family:system-ui, sans-serif; }
   .gold{ color:#facc15; }
-  .card{ background:#15151f; border:1px solid #262637; border-radius:20px; }
-  input,select{ background:#1e1e2e !important; border:1px solid #333 !important; color:white !important; border-radius:12px; padding:14px; width:100%; outline:none; font-size:15px; }
-  input:focus,select:focus{ border-color:#facc15 !important; }
-  .btn-gold{ background:#facc15; color:#000; font-weight:800; padding:15px; border-radius:12px; width:100%; font-size:16px; }
-  .btn-green{ background:#22c55e; color:white; font-weight:700; padding:12px; border-radius:10px; }
-  .btn-red{ background:#ef4444; color:white; font-weight:700; padding:12px; border-radius:10px; }
-  label{ font-size:11px; font-weight:700; letter-spacing:.05em; color:#a1a1aa; }
+  .card{ background:#15151f; border:1px solid #2a2a3a; border-radius:20px; }
+  input,select{ background:#1e1e2e !important; border:1px solid #333 !important; color:white !important; border-radius:12px; padding:14px; width:100%; outline:none; }
+  .btn-gold{ background:#facc15; color:black; font-weight:800; padding:14px; border-radius:12px; width:100%; }
+  .btn-green{ background:#22c55e; color:white; font-weight:700; padding:10px; border-radius:10px; }
+  .btn-red{ background:#ef4444; color:white; font-weight:700; padding:10px; border-radius:10px; }
 </style>
 </head>
-<body>
+<body class="p-4 max-w-md mx-auto">
 
-<!-- ===== MAIN SITE - BEAUTIFUL INTERFACE ===== -->
-<div id="mainSite" class="max-w-md mx-auto px-4 pb-10">
-  <div class="flex justify-between items-center py-5">
-    <h1 class="text-2xl font-black tracking-tight">🛡️ Safe <span class="gold">Trade</span></h1>
-    <span class="bg-green-500/10 text-green-400 text-[11px] font-bold px-3 py-1.5 rounded-full border border-green-500/30">● ESCROW LIVE</span>
+<!-- NORMAL SITE -->
+<div id="mainSite">
+  <div class="flex justify-between items-center py-4">
+    <h1 class="text-2xl font-black">🛡️ Safe <span class="gold">Trade</span></h1>
+    <span class="bg-green-500/10 text-green-400 text-xs px-3 py-1 rounded-full border border-green-500/30">● ESCROW LIVE</span>
   </div>
 
   <div class="card p-5">
-    <p class="text-yellow-400 text-[11px] font-bold tracking-widest">TRUSTED BY 1,200+ SELLERS IN NIGERIA</p>
-    <h2 class="text-[32px] leading-[1.1] font-black mt-2">Sell anything with <span class="gold">zero risk.</span></h2>
-    <p class="text-gray-400 text-[14px] leading-relaxed mt-2">We hold the buyer's money until they confirm delivery. You get paid instantly after. No stories.</p>
+    <p class="text-yellow-400 text-xs font-bold tracking-widest">TRUSTED BY 1,200+ SELLERS IN NIGERIA</p>
+    <h2 class="text-3xl font-black mt-2">Sell anything with <span class="gold">zero risk.</span></h2>
+    <p class="text-gray-400 text-sm mt-2">We hold the buyer's money until they confirm delivery. You get paid instantly after. No stories.</p>
     <div class="grid grid-cols-3 gap-2 mt-4 text-center">
-      <div class="bg-[#1c1c2a] rounded-xl p-3"><p class="font-bold text-[15px]">₦3.2M+</p><p class="text-[10px] text-gray-400 mt-0.5">SECURED</p></div>
-      <div class="bg-[#1c1c2a] rounded-xl p-3"><p class="font-bold text-[15px]">97%</p><p class="text-[10px] text-gray-400 mt-0.5">YOU KEEP</p></div>
-      <div class="bg-[#1c1c2a] rounded-xl p-3"><p class="font-bold text-[15px]">&lt; 2 min</p><p class="text-[10px] text-gray-400 mt-0.5">PAYOUT</p></div>
+      <div class="card p-3"><p class="font-bold">₦3.2M+</p><p class="text-xs text-gray-400">SECURED</p></div>
+      <div class="card p-3"><p class="font-bold">97%</p><p class="text-xs text-gray-400">YOU KEEP</p></div>
+      <div class="card p-3"><p class="font-bold">&lt; 2 min</p><p class="text-xs text-gray-400">PAYOUT</p></div>
     </div>
   </div>
 
-  <div class="mt-5">
-    <h3 class="font-bold text-[16px] mb-3">How It Works</h3>
-    <div class="space-y-2">
-      <div class="card p-4 flex gap-3 items-start"><span class="bg-yellow-400 text-black font-black w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0">1</span><div><p class="font-bold text-sm">Create a deal</p><p class="text-gray-400 text-xs mt-0.5">Add item, price & your bank. Share link to buyer.</p></div></div>
-      <div class="card p-4 flex gap-3 items-start"><span class="bg-yellow-400 text-black font-black w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0">2</span><div><p class="font-bold text-sm">Buyer pays into escrow</p><p class="text-gray-400 text-xs mt-0.5">Money is locked safely. Seller ships / delivers.</p></div></div>
-      <div class="card p-4 flex gap-3 items-start"><span class="bg-yellow-400 text-black font-black w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0">3</span><div><p class="font-bold text-sm">Buyer confirms, you get paid</p><p class="text-gray-400 text-xs mt-0.5">Instant payout to your bank. 3% fee only.</p></div></div>
-    </div>
-  </div>
-
-  <div class="card p-5 mt-5" id="createBox">
-    <h3 class="font-bold text-[18px]">🔒 Create a Safe Deal</h3>
-    <p class="text-gray-400 text-[13px] mt-1">Your bank is verified by Paystack. Buyers pay into escrow, not directly to you.</p>
-    <div class="mt-4 space-y-3">
-      <div><label>WHAT ARE YOU SELLING?</label><input id="item" placeholder="e.g. iPhone 13 128GB - Neat" class="mt-1.5"></div>
-      <div><label>PRICE (₦)</label><input id="amount" type="number" placeholder="e.g. 50000" class="mt-1.5"></div>
-      <div><label>YOUR NAME</label><input id="sellerName" placeholder="Your name" class="mt-1.5"></div>
-      <div><label>YOUR PHONE (0...)</label><input id="sellerPhone" placeholder="080..." maxlength="11" class="mt-1.5"></div>
-      <div><label>BANK</label><select id="bankCode" class="mt-1.5"><option value="">Select Bank...</option><option value="044">Access Bank</option><option value="058">GTBank</option><option value="011">First Bank</option><option value="033">UBA</option><option value="057">Zenith Bank</option><option value="070">Fidelity Bank</option><option value="214">FCMB</option><option value="032">Union Bank</option><option value="035">Wema Bank</option><option value="221">Stanbic IBTC</option><option value="232">Sterling Bank</option><option value="001">Jaiz Bank</option><option value="999">OPay</option><option value="9999">Moniepoint</option><option value="100">Kuda MFB</option></select></div>
-      <div><label>ACCOUNT NUMBER</label><input id="account" placeholder="10-digit account number" maxlength="10" class="mt-1.5"><p id="accountName" class="text-green-400 text-sm mt-1"></p></div>
-    </div>
+  <div class="card p-5 mt-4" id="createBox">
+    <h3 class="font-bold text-lg">🔒 Create a Safe Deal</h3>
+    <p class="text-gray-400 text-sm">Your bank is verified by Paystack. Buyers pay into escrow, not directly to you.</p>
+    <label class="text-xs font-bold mt-4 block">WHAT ARE YOU SELLING?</label>
+    <input id="item" placeholder="e.g. iPhone 13 128GB - Neat" class="mt-1">
+    <label class="text-xs font-bold mt-3 block">PRICE (₦)</label>
+    <input id="amount" type="number" placeholder="e.g. 50000" class="mt-1">
+    <label class="text-xs font-bold mt-3 block">YOUR NAME</label>
+    <input id="sellerName" placeholder="Your name" class="mt-1">
+    <label class="text-xs font-bold mt-3 block">YOUR PHONE (0...)</label>
+    <input id="sellerPhone" placeholder="080..." maxlength="11" class="mt-1">
+    <label class="text-xs font-bold mt-3 block">BANK</label>
+    <select id="bankCode"><option value="">Select Bank...</option><option value="044">Access Bank</option><option value="058">GTBank</option><option value="011">First Bank</option><option value="033">UBA</option><option value="057">Zenith Bank</option><option value="070">Fidelity Bank</option><option value="214">FCMB</option><option value="032">Union Bank</option><option value="035">Wema Bank</option><option value="221">Stanbic IBTC</option><option value="232">Sterling Bank</option><option value="001">Jaiz Bank</option><option value="999">OPay</option><option value="9999">Moniepoint</option><option value="100">Kuda MFB</option></select>
+    <label class="text-xs font-bold mt-3 block">ACCOUNT NUMBER</label>
+    <input id="account" placeholder="10-digit account number" maxlength="10" class="mt-1">
+    <p id="accountName" class="text-green-400 text-sm mt-1"></p>
     <button onclick="createDeal()" id="createBtn" class="btn-gold mt-4">Create Secure Link →</button>
     <p id="createMsg" class="text-center text-sm mt-2"></p>
     <div id="linkBox" class="hidden mt-3 bg-green-500/10 border border-green-500/30 p-3 rounded-xl">
       <p class="text-xs text-gray-300">Share this link to buyer:</p>
-      <p id="dealLink" class="text-yellow-300 text-sm break-all font-bold mt-1"></p>
+      <p id="dealLink" class="text-yellow-300 text-sm break-all font-bold"></p>
       <button onclick="copyLink()" class="btn-green w-full mt-2">Copy Link</button>
     </div>
   </div>
 
-  <div class="card p-5 mt-5 hidden" id="buyerBox">
-    <h3 class="font-bold text-[18px]">Buyer Checkout</h3>
-    <div id="dealDetails" class="text-sm text-gray-300 mt-2 leading-relaxed"></div>
-    <div class="space-y-2 mt-3"><input id="buyerName" placeholder="Buyer name"><input id="buyerPhone" placeholder="Buyer phone 080..."><input id="buyerEmail" placeholder="Buyer email"></div>
+  <!-- BUYER VIEW -->
+  <div class="card p-5 mt-4 hidden" id="buyerBox">
+    <h3 class="font-bold text-lg">Buyer Checkout</h3>
+    <div id="dealDetails" class="text-sm text-gray-300 mt-2"></div>
+    <input id="buyerName" placeholder="Buyer name" class="mt-3">
+    <input id="buyerPhone" placeholder="Buyer phone 080..." class="mt-2">
+    <input id="buyerEmail" placeholder="Buyer email" class="mt-2">
     <button onclick="payNow()" class="btn-gold mt-3">Pay Into Escrow →</button>
     <button onclick="markReceived()" class="btn-green w-full mt-2 hidden" id="receivedBtn">I Received It - Release To Seller</button>
     <button onclick="reportIssue()" class="btn-red w-full mt-2 hidden" id="disputeBtn">Report Problem</button>
     <p id="payMsg" class="text-center text-sm mt-2"></p>
   </div>
-
-  <div class="card p-5 mt-5">
-    <h3 class="font-bold">Why sellers trust SafeTrade?</h3>
-    <p class="text-gray-400 text-sm mt-2">✅ No more "I sent it, I didn't receive it" stories<br>✅ Money is held safely until delivery confirmed<br>✅ If buyer lies, admin reviews and refunds you<br>✅ Payout in under 2 minutes</p>
-  </div>
-
-  <p class="text-center text-gray-500 text-[11px] mt-6">SafeTrade • Escrow Protected • Lagos, Nigeria<br>Terms apply</p>
 </div>
 
-<!-- ===== ADMIN - SEPARATE ===== -->
-<div id="adminSite" class="hidden max-w-md mx-auto px-4 pb-10">
-  <h1 class="text-2xl font-black mt-5">🛡️ Admin <span class="gold">Dashboard</span></h1>
+<!-- ADMIN SITE - ONLY SHOWS WHEN ?admin -->
+<div id="adminSite" class="hidden">
+  <h1 class="text-2xl font-black mt-2">🛡️ Admin <span class="gold">Dashboard</span></h1>
   <p class="text-gray-400 text-sm">Private - Do not share this link</p>
   <button onclick="adminLogin()" id="adminLoginBtn" class="btn-gold mt-4">Login With Google (Admin Only)</button>
   <p id="adminMsg" class="text-sm mt-2"></p>
@@ -101,6 +91,7 @@
 </div>
 
 <script>
+// === FIREBASE CONFIG - YOURS ===
 const firebaseConfig = {
   apiKey: "AIzaSyDibL7nsZv_s7aokIE8jRZTQ9BvzZMA-pE",
   authDomain: "safetrade-46ecb.firebaseapp.com",
@@ -115,12 +106,15 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 const ADMIN_UID = "GUAcd6kJxeRxO7W8E4LaZiNij2t2";
 let currentDeal = null, currentDealPath = null, currentLink = "";
+
+// === CHECK IF ADMIN MODE ===
 const isAdminMode = window.location.search.includes("admin");
 if(isAdminMode){
   document.getElementById("mainSite").style.display = "none";
   document.getElementById("adminSite").classList.remove("hidden");
   document.title = "SafeTrade Admin";
 }
+
 async function adminLogin(){
   try{
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -131,22 +125,39 @@ async function adminLogin(){
     loadAdminDeals();
   }catch(e){ document.getElementById("adminMsg").innerText = "Login error: "+e.message; }
 }
-auth.onAuthStateChanged(u=>{ if(isAdminMode && u && u.uid===ADMIN_UID){ document.getElementById("adminLoginBtn").style.display="none"; loadAdminDeals(); } });
+auth.onAuthStateChanged(u=>{
+  if(isAdminMode && u && u.uid===ADMIN_UID){
+    document.getElementById("adminLoginBtn").style.display="none";
+    loadAdminDeals();
+  }
+});
 async function loadAdminDeals(){
   const snap = await db.collectionGroup("deals").orderBy("createdAt","desc").limit(50).get();
   let html = "";
   if(snap.empty) html = "<p>No deals yet</p>";
   snap.forEach(doc=>{
     const d = doc.data();
-    html += `<div class="card p-4"><p class="font-bold">${d.item||""} - ₦${(d.amount||0).toLocaleString()}</p><p class="text-xs text-gray-400 mt-1">Seller: ${d.sellerName||""} (${d.sellerPhone||""}) | Buyer: ${d.buyerName||"-"}</p><p class="text-xs mt-1">Status: <b class="text-yellow-300">${d.status}</b> | Ref: ${d.paystackRef||""}</p><div class="flex gap-2 mt-3"><button onclick="adminAction('${doc.ref.path}','release')" class="btn-green flex-1">Release</button><button onclick="adminAction('${doc.ref.path}','refund')" class="btn-red flex-1">Refund</button></div></div>`;
+    html += `<div class="card p-4">
+      <p class="font-bold">${d.item||""} - ₦${(d.amount||0).toLocaleString()}</p>
+      <p class="text-xs text-gray-400">Seller: ${d.sellerName||""} (${d.sellerPhone||""}) | Buyer: ${d.buyerName||"-"}</p>
+      <p class="text-xs">Status: <b class="text-yellow-300">${d.status}</b> | Ref: ${d.paystackRef||""}</p>
+      <div class="flex gap-2 mt-2">
+        <button onclick="adminAction('${doc.ref.path}','release')" class="btn-green flex-1">Release</button>
+        <button onclick="adminAction('${doc.ref.path}','refund')" class="btn-red flex-1">Refund</button>
+      </div>
+    </div>`;
   });
   document.getElementById("adminList").innerHTML = html;
 }
 async function adminAction(path, action){
   if(!confirm("Are you sure you want to "+action+" this deal?")) return;
   const res = await fetch("/.netlify/functions/admin-action", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({path, action})});
-  const j = await res.json(); alert(j.message || "Done"); loadAdminDeals();
+  const j = await res.json();
+  alert(j.message || "Done");
+  loadAdminDeals();
 }
+
+// === NORMAL FUNCTIONS (Create / Pay) ===
 async function createDeal(){
   const item=document.getElementById("item").value.trim();
   const amount=parseInt(document.getElementById("amount").value);
@@ -158,7 +169,8 @@ async function createDeal(){
   document.getElementById("createBtn").innerText="Creating...";
   try{
     const res = await fetch("/.netlify/functions/create-deal", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({item, amount, sellerName, sellerPhone, bankCode, account})});
-    const j = await res.json(); if(!j.success) throw new Error(j.error||"Failed");
+    const j = await res.json();
+    if(!j.success) throw new Error(j.error||"Failed");
     currentLink = window.location.origin + "/?deal=" + j.dealId + "&seller=" + sellerPhone;
     document.getElementById("dealLink").innerText = currentLink;
     document.getElementById("linkBox").classList.remove("hidden");
@@ -167,6 +179,8 @@ async function createDeal(){
   document.getElementById("createBtn").innerText="Create Secure Link →";
 }
 function copyLink(){ navigator.clipboard.writeText(currentLink); alert("Link copied!"); }
+
+// Load deal if ?deal= in URL
 const params = new URLSearchParams(window.location.search);
 if(params.get("deal")){
   const dealId=params.get("deal"), seller=params.get("seller");
@@ -176,7 +190,10 @@ if(params.get("deal")){
     document.getElementById("buyerBox").classList.remove("hidden");
     document.getElementById("createBox").style.display="none";
     document.getElementById("dealDetails").innerHTML = `<b>${currentDeal.item}</b><br>Price: ₦${currentDeal.amount.toLocaleString()}<br>Seller: ${currentDeal.sellerName}<br>Status: <b>${currentDeal.status}</b>`;
-    if(currentDeal.status==="HOLDING"){ document.getElementById("receivedBtn").classList.remove("hidden"); document.getElementById("disputeBtn").classList.remove("hidden"); }
+    if(currentDeal.status==="HOLDING"){
+      document.getElementById("receivedBtn").classList.remove("hidden");
+      document.getElementById("disputeBtn").classList.remove("hidden");
+    }
   });
 }
 async function payNow(){
@@ -191,7 +208,8 @@ async function payNow(){
     currency: "NGN",
     callback: async function(resp){
       await fetch("/.netlify/functions/verify-payment", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({reference: resp.reference, path: currentDealPath, buyerName, buyerPhone, buyerEmail})});
-      document.getElementById("payMsg").innerText="✅ Payment held in escrow!"; location.reload();
+      document.getElementById("payMsg").innerText="✅ Payment held in escrow!";
+      location.reload();
     },
     onClose: function(){ document.getElementById("payMsg").innerText="Payment cancelled"; }
   });
@@ -199,25 +217,27 @@ async function payNow(){
 }
 async function markReceived(){ await fetch("/.netlify/functions/release-funds", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({path: currentDealPath})}); alert("Release requested - seller will be paid"); location.reload(); }
 async function reportIssue(){ await db.doc(currentDealPath).update({status:"DISPUTED"}); alert("Dispute reported. Money locked. Admin will review."); location.reload(); }
+
+// Bank verification
 document.getElementById("account")?.addEventListener("input", async e=>{
   const acc=e.target.value; const bank=document.getElementById("bankCode").value;
   if(acc.length===10 && bank){
     document.getElementById("accountName").innerText="Verifying...";
-    try{ const r=await fetch("/.netlify/functions/verify-bank?account="+acc+"&bank="+bank); const j=await r.json(); document.getElementById("accountName").innerText = j.account_name ? "✅ "+j.account_name : "❌ Could not verify"; }catch{ document.getElementById("accountName").innerText=""; }
+    try{
+      const r=await fetch("/.netlify/functions/verify-bank?account="+acc+"&bank="+bank);
+      const j=await r.json(); document.getElementById("accountName").innerText = j.account_name ? "✅ "+j.account_name : "❌ Could not verify";
+    }catch{ document.getElementById("accountName").innerText=""; }
   }
 });
 </script>
 
-<!-- === NETLIFY BADGE HIDER - JS PART - DO NOT REMOVE === -->
+<!-- === NETLIFY BADGE HIDER JS - DO NOT REMOVE === -->
 <script>
 (function(){
   function hideBadge(){
-    document.querySelectorAll('iframe[src*="netlify"], div[data-netlify-badge], [class*="netlify-badge"]').forEach(el=>{ el.style.display='none'; el.remove(); });
-    // Extra safety: hide any fixed bottom-right badge
-    document.querySelectorAll('a[href*="netlify.com"]').forEach(el=>{ if(el.textContent.toLowerCase().includes('netlify') || el.textContent.toLowerCase().includes('deploy')){ el.style.display='none'; } });
+    document.querySelectorAll('iframe[src*="netlify"], div[data-netlify-badge], a[href*="netlify"], [class*="netlify-badge"]').forEach(el=>{ el.style.display='none'; el.remove(); });
   }
-  hideBadge();
-  setInterval(hideBadge, 500);
+  hideBadge(); setInterval(hideBadge, 500);
   new MutationObserver(hideBadge).observe(document.body, {childList:true, subtree:true});
 })();
 </script>
