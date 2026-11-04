@@ -1,25 +1,28 @@
-<!DOCTYPE html>
+just<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SafeTrade</title>
+<title>SafeTrade – Secure Escrow for Nigeria</title>
 <style>
 :root{--bg:#07080c;--card:#12141b;--line:#232734;--tx:#f3f4f7;--mu:#8b90a0;--gold:#FFD34D;--gold2:#D4AF37;--ok:#3ecf74;--bad:#ff5d5d;--warn:#ffa726}
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,Arial,sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif}
 body{background:var(--bg);color:var(--tx);padding:14px 14px 90px}
 .wrap{max-width:760px;margin:0 auto}
-.hero{text-align:center;padding:26px 0 10px}.hero p{color:var(--mu);font-size:13px;margin-top:6px}
+.hero{text-align:center;padding:26px 0 10px}
+.hero p{color:var(--mu);font-size:13px;margin-top:6px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px}
-.card h3{font-size:16px;margin-bottom:8px}.card p{font-size:13px;color:var(--mu)}
+.card h3{font-size:16px;margin-bottom:8px}
 input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--tx);margin-bottom:10px;font-size:15px}
 .btn{width:100%;padding:14px;border:0;border-radius:50px;font-weight:800;font-size:15px;cursor:pointer;margin-top:6px}
 .gold{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}
-.green{background:var(--ok);color:#000}.red{background:var(--bad);color:#fff}
+.green{background:var(--ok);color:#000}
+.red{background:var(--bad);color:#fff}
 .badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:800;margin-bottom:8px;color:#000;background:var(--ok)}
 .fee{background:rgba(212,175,55,.1);border:1px dashed var(--gold2);border-radius:12px;padding:12px;font-size:13px;margin:6px 0 10px}
-.err{color:var(--bad);font-size:13px;min-height:18px}
-.note{border-radius:12px;padding:11px;font-size:13px;margin:8px 0}.n-ok{background:rgba(62,207,116,.14);border:1px solid var(--ok)}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-bottom:6px}
+.note{border-radius:12px;padding:11px;font-size:13px;margin:8px 0}
+.n-ok{background:rgba(62,207,116,.14);border:1px solid var(--ok)}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:30px;font-size:13px;z-index:200;display:none}
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
@@ -29,7 +32,7 @@ input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--l
 <div id="toast"></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, onSnapshot, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const CFG = {apiKey:"AIzaSyDibL7nsZv_s7aokIE8jRZTQ9BvzZMA-pE",authDomain:"safetrade-46ecb.firebaseapp.com",projectId:"safetrade-46ecb",storageBucket:"safetrade-46ecb.firebasestorage.app",messagingSenderId:"306044200789",appId:"1:306044200789:web:3225f3c95e616b014d31dc"};
 const PAYSTACK_PK = "pk_test_84fc3f60a592f740e64594031fafa6a08ffad240";
 const FN = "/.netlify/functions/";
@@ -37,62 +40,160 @@ const app = initializeApp(CFG);
 const db = getFirestore(app);
 const Q = new URLSearchParams(location.search);
 const PAY = (Q.get("pay")||"").match(/^(0\d{10})\.([A-Za-z0-9]{20})$/);
-const $ = (s)=>document.querySelector(s);
-const esc = (s)=>String(s==null?"":s).replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-const N = (n)=>"₦"+Number(n).toLocaleString();
-const toast = (m)=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",4000);};
-async function call(n,body){const r=await fetch(FN+n,{method:body?"POST":"GET",headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});const j=await r.json().catch(()=>({}));if(!r.ok) throw new Error(j.error||"Request failed");return j;}
-const BRAND = '<div style="display:flex;align-items:center;gap:10px;justify-content:center"><b style="font-size:22px">SafeTrade</b></div>';
-const FALLBACK = [["Access Bank","044"],["Fidelity Bank","070"],["First Bank","011"],["GTBank","058"],["Kuda","50211"],["Moniepoint","50515"],["OPay","999992"],["PalmPay","999991"],["UBA","033"],["Zenith Bank","057"]].map((x)=>({name:x[0],code:x[1]}));
-let banks=null,currentDeal=null;
-function dealLink(p,i){return location.origin+"/?pay="+p+"."+i;}
-function shell(inner){document.getElementById("app").innerHTML = '<div style="text-align:center;padding:26px 0 10px">'+BRAND+'<p style="color:#8b90a0;font-size:13px;margin-top:6px">We hold buyer money until goods arrive.</p></div>'+inner;}
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s==null?"":s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const N = (n) => "₦" + Number(n).toLocaleString();
+const toast = (m) => { const t = $("#toast"); t.textContent = m; t.style.display = "block"; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = "none", 4000); };
+async function call(n, body) {
+  const r = await fetch(FN + n, { method: body ? "POST" : "GET", headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || "Request failed");
+  return j;
+}
+const FALLBACK = [["Access Bank","044"],["Fidelity Bank","070"],["First Bank","011"],["GTBank","058"],["Kuda","50211"],["Moniepoint","50515"],["OPay","999992"],["PalmPay","999991"],["UBA","033"],["Zenith Bank","057"]].map(x=>({name:x[0],code:x[1]}));
+let banks = null;
+let currentDeal = null;
+function dealLink(p,i){ return location.origin + "/?pay=" + p + "." + i; }
+function shell(inner){
+  const logoSvg = '<svg width="40" height="40" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="#1b2030" stroke="#FFD34D" stroke-width="4"/><rect x="34" y="46" width="32" height="24" rx="5" fill="#FFD34D"/></svg>';
+  const brand = '<div style="display:flex;align-items:center;gap:10px;justify-content:center">' + logoSvg + '<b style="font-size:22px">Safe<span style="color:#FFD34D">Trade</span></b></div>';
+  const top = '<div style="text-align:center;padding:26px 0 10px">' + brand + '<p style="color:#8b90a0;font-size:13px;margin-top:6px">We hold buyer money until goods arrive. Then seller is paid automatically.</p></div>';
+  document.getElementById("app").innerHTML = top + inner;
+}
 async function sellView(done){
-  if(!banks){try{const l=await call("banks");banks=Array.isArray(l)&&l.length?l:FALLBACK;}catch(e){banks=FALLBACK;}}
+  if(!banks){
+    try{ const l = await call("banks"); banks = Array.isArray(l) && l.length ? l : FALLBACK; }catch(e){ banks = FALLBACK; }
+  }
   if(done){
-    const h = '<div class="card" style="text-align:center"><h3>Deal created</h3><p>Verified: <b>'+esc(done.accountName)+'</b></p><br><input readonly id="lk" value="'+esc(dealLink(done.phone,done.id))+'"><button class="btn gold" data-a="copy">Copy link</button><br><button class="btn" data-a="again" style="background:transparent;border:1px solid #232734;color:#f3f4f7">Create another</button></div>';
+    const link = dealLink(done.phone,done.id);
+    const waShare = "https://wa.me/?text=" + encodeURIComponent("Pay safely via SafeTrade: " + link);
+    const h = '<div class="card" style="text-align:center"><div style="font-size:44px">🔗</div><h3>Deal created</h3><p>Verified: <b>' + esc(done.accountName) + '</b></p><br><input readonly id="lk" value="' + esc(link) + '"><button class="btn gold" data-a="copy">Copy link</button><a href="' + waShare + '" target="_blank" class="btn green" style="display:block;text-align:center;text-decoration:none;margin-top:6px">Share on WhatsApp</a><br><button class="btn" data-a="again" style="background:transparent;border:1px solid #232734;color:#f3f4f7;margin-top:10px">Create another</button></div>';
     shell(h);
   } else {
-    const opts = banks.map((b)=>'<option value="'+esc(b.code)+'">'+esc(b.name)+'</option>').join("");
-    const h2 = '<div class="card"><h3>Create a Safe Deal</h3><label style="font-size:12px;color:#8b90a0">What are you selling?</label><input id="item" maxlength="80"><label style="font-size:12px;color:#8b90a0">Price</label><input id="am" type="number" min="1000"><div class="fee" id="fee">You receive 97%</div><label style="font-size:12px;color:#8b90a0">Your name</label><input id="sn"><label style="font-size:12px;color:#8b90a0">Your phone</label><input id="sp" placeholder="08012345678"><label style="font-size:12px;color:#8b90a0">Your bank</label><select id="bk"><option value="">Choose bank</option>'+opts+'</select><label style="font-size:12px;color:#8b90a0">Account number</label><input id="ac" maxlength="10"><div class="fee" id="ai">Enter 10-digit account</div><p class="err" id="msg"></p><button class="btn gold" data-a="create">CREATE DEAL LINK</button></div>';
+    const opts = banks.map(b=>'<option value="' + esc(b.code) + '">' + esc(b.name) + '</option>').join("");
+    const h2 = '<div class="card"><h3>🔒 Create a Safe Deal</h3>' +
+      '<label style="font-size:12px;color:#8b90a0">What are you selling?</label><input id="item" maxlength="80">' +
+      '<label style="font-size:12px;color:#8b90a0">Price (₦)</label><input id="am" type="number" min="1000">' +
+      '<div class="fee" id="fee">Enter price - you will receive 97%</div>' +
+      '<label style="font-size:12px;color:#8b90a0">Your name</label><input id="sn">' +
+      '<label style="font-size:12px;color:#8b90a0">Your phone</label><input id="sp" placeholder="08012345678">' +
+      '<label style="font-size:12px;color:#8b90a0">Your bank</label><select id="bk"><option value="">Choose bank</option>' + opts + '</select>' +
+      '<label style="font-size:12px;color:#8b90a0">Account number</label><input id="ac" maxlength="10">' +
+      '<div class="fee" id="ai">Enter 10-digit account</div><p class="err" id="msg"></p>' +
+      '<button class="btn gold" data-a="create">CREATE DEAL LINK</button></div>';
     shell(h2);
   }
 }
 async function createDeal(){
-  const g = (i)=>$(i).value.trim(); const m = $("#msg"); m.textContent="Verifying...";
-  try{const r=await call("create-deal",{item:g("#item"),amount:Number(g("#am")),sellerName:g("#sn"),sellerPhone:g("#sp"),bankCode:$("#bk").value,account:g("#ac")});sellView(r);}catch(e){m.textContent=e.message;}
+  const g = (i) => $(i).value.trim();
+  const m = $("#msg");
+  m.textContent = "Verifying...";
+  try{
+    const r = await call("create-deal", { item:g("#item"), amount:Number(g("#am")), sellerName:g("#sn"), sellerPhone:g("#sp"), bankCode:$("#bk").value, account:g("#ac") });
+    sellView(r);
+  }catch(e){ m.textContent = e.message; }
 }
-let rseq=0,rt;
+let rseq=0, rt;
 function resolveAcct(){
-  clearTimeout(rt); const ac = $("#ac")?$("#ac").value:""; const bk = $("#bk")?$("#bk").value:""; const box = $("#ai"); if(!box) return;
-  if(ac.length!==10||!bk){box.textContent="Enter 10-digit account";return;} box.textContent="Checking..."; const my=++rseq;
-  rt=setTimeout(async()=>{try{const r=await call("resolve-account",{account:ac,bankCode:bk}); if(my!==rseq) return; box.textContent = r.ok ? "VERIFIED "+r.accountName : "Could not verify";}catch(e){if(my===rseq) box.textContent=e.message;}},300);
+  clearTimeout(rt);
+  const ac = $("#ac") ? $("#ac").value : "";
+  const bk = $("#bk") ? $("#bk").value : "";
+  const box = $("#ai");
+  if(!box) return;
+  if(ac.length!==10 || !bk){ box.textContent = "Enter 10-digit account"; return; }
+  box.textContent = "Checking...";
+  const my = ++rseq;
+  rt = setTimeout(async()=>{
+    try{
+      const r = await call("resolve-account", { account:ac, bankCode:bk });
+      if(my!==rseq) return;
+      box.textContent = r.ok ? "VERIFIED " + r.accountName : (r.error || "Could not verify");
+    }catch(e){ if(my===rseq) box.textContent = e.message; }
+  },300);
 }
 function payView(d){
-  currentDeal=d; if(!d){shell('<div class="card"><h3>Deal not found</h3></div>');return;}
-  const S=d.status;
-  let body="";
-  if(S==="AWAITING_PAYMENT"){
-    body = '<div class="fee">Seller verified: <b>'+esc(d.accountName)+'</b> - '+N(d.amount)+'</div><label>Your name</label><input id="bn"><label>Your phone</label><input id="bp"><label>Your email</label><input id="be" type="email"><p class="err" id="msg"></p><button class="btn gold" data-a="pay">PAY SAFELY</button>';
-  } else if(S==="HOLDING"){
-    body = '<div class="note n-ok">Payment received. SafeTrade holds '+N(d.amount)+'</div><div style="margin-top:12px"><button class="btn green" data-a="rel">I received it - pay seller</button><button class="btn red" data-a="dsp" style="margin-top:6px">Report problem</button></div>';
-  } else if(S==="RELEASED"){
-    body = '<div class="note n-ok">Seller has been paid. Done.</div>';
+  currentDeal = d;
+  if(!d){ shell('<div class="card"><h3>Deal not found</h3></div>'); return; }
+  const S = d.status;
+  let body = "";
+  if(S === "AWAITING_PAYMENT"){
+    body = '<div class="fee">Seller verified: <b>' + esc(d.accountName) + '</b> - ' + N(d.amount) + '</div>' +
+           '<label style="font-size:12px;color:#8b90a0">Your name</label><input id="bn">' +
+           '<label style="font-size:12px;color:#8b90a0">Your phone</label><input id="bp">' +
+           '<label style="font-size:12px;color:#8b90a0">Your email</label><input id="be" type="email"><p class="err" id="msg"></p>' +
+           '<button class="btn gold" data-a="pay">PAY SAFELY</button>';
+  } else if(S === "HOLDING"){
+    const waNumber = d.sellerPhone.startsWith("0") ? "234" + d.sellerPhone.slice(1) : d.sellerPhone;
+    const waText = encodeURIComponent("SafeTrade: I just paid " + N(d.amount) + " for " + d.item + ". Please check.");
+    const waLink = "https://wa.me/" + waNumber + "?text=" + waText;
+    body = '<div class="note n-ok">Payment received. SafeTrade holds ' + N(d.amount) + ' in escrow.</div>' +
+           '<a href="' + waLink + '" target="_blank" style="display:block;text-align:center;text-decoration:none;margin-top:10px;background:#25D366;color:#000;padding:14px;border-radius:50px;font-weight:800">Notify Seller on WhatsApp</a>' +
+           '<p style="font-size:12px;color:#8b90a0;margin-top:8px;text-align:center">Only press green AFTER you receive item.</p>' +
+           '<div style="margin-top:12px"><button class="btn green" data-a="rel">I received it - pay seller</button>' +
+           '<button class="btn red" data-a="dsp" style="margin-top:6px">Report problem</button></div>';
+  } else if(S === "RELEASED"){
+    body = '<div class="note n-ok">Seller has been paid. Deal complete.</div>';
   } else {
-    body = '<div class="note">Status: '+esc(S)+'</div>';
+    body = '<div class="note">Status: ' + esc(S) + '</div>';
   }
-  shell('<div class="card"><span class="badge">'+esc(S)+'</span><h3>'+esc(d.item)+'</h3><p>Seller: '+esc(d.sellerName)+'</p>'+body+'</div>');
+  const inner = '<div class="card"><span class="badge">' + esc(S) + '</span><h3>' + esc(d.item) + '</h3><p>Seller: ' + esc(d.sellerName) + '</p>' + body + '</div>';
+  shell(inner);
 }
 async function handlePay(){
-  const d=currentDeal;if(!d)return; const bn=$("#bn").value.trim(),bp=$("#bp").value.trim(),be=$("#be").value.trim(),msg=$("#msg"); if(!bn||!bp||!be){msg.textContent="Fill all";return;} msg.textContent="Opening Paystack...";
-  const handler=PaystackPop.setup({key:PAYSTACK_PK,email:be,amount:d.amount*100,currency:"NGN",ref:""+Date.now(),callback:async function(res){try{msg.textContent="Verifying...";await updateDoc(doc(db,"sellers",d.sellerPhone,"deals",d.id),{status:"HOLDING",buyerName:bn,buyerPhone:bp,buyerEmail:be,paystackRef:res.reference,paidAt:new Date()});toast("Paid");payView({...d,status:"HOLDING"});}catch(e){msg.textContent=e.message;}},onClose:function(){msg.textContent="Payment cancelled";}});handler.openIframe();
+  const d = currentDeal; if(!d) return;
+  const bn = $("#bn").value.trim(), bp = $("#bp").value.trim(), be = $("#be").value.trim(), msg = $("#msg");
+  if(!bn || !bp || !be){ msg.textContent = "Fill all"; return; }
+  msg.textContent = "Opening Paystack...";
+  const handler = PaystackPop.setup({
+    key: PAYSTACK_PK, email: be, amount: d.amount * 100, currency: "NGN", ref: "" + Date.now(),
+    callback: async function(res){
+      try{
+        msg.textContent = "Verifying...";
+        await updateDoc(doc(db,"sellers",d.sellerPhone,"deals",d.id), { status:"HOLDING", buyerName:bn, buyerPhone:bp, buyerEmail:be, paystackRef:res.reference, paidAt:new Date() });
+        toast("Paid");
+        payView({...d, status:"HOLDING"});
+      }catch(e){ msg.textContent = e.message; }
+    },
+    onClose: function(){ msg.textContent = "Payment cancelled"; }
+  });
+  handler.openIframe();
 }
 async function handleRelease(btn){
-  const d=currentDeal;if(!d)return; if(!confirm("Pay seller now?")) return; const orig=btn.textContent;btn.textContent="Paying...";btn.disabled=true;
-  try{const res=await fetch(FN+"release-funds",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sellerPhone:d.sellerPhone,dealId:d.id,amount:d.amount,bankCode:d.bankCode,accountNumber:d.accountNumber||d.account,sellerName:d.sellerName,accountName:d.accountName})});const j=await res.json();if(!j.ok) throw new Error(j.error||"Payout failed");await updateDoc(doc(db,"sellers",d.sellerPhone,"deals",d.id),{status:"RELEASED",releasedAt:new Date(),payout:j.payout});toast("Paid");payView({...d,status:"RELEASED"});}catch(e){toast(e.message);btn.textContent=orig;btn.disabled=false;}
+  const d = currentDeal; if(!d) return;
+  if(!confirm("Pay seller now?")) return;
+  const orig = btn.textContent; btn.textContent = "Paying..."; btn.disabled = true;
+  try{
+    const res = await fetch(FN + "release-funds", { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify({ sellerPhone:d.sellerPhone, dealId:d.id, amount:d.amount, bankCode:d.bankCode, accountNumber:d.accountNumber||d.account, sellerName:d.sellerName, accountName:d.accountName }) });
+    const j = await res.json();
+    if(!j.ok) throw new Error(j.error || "Payout failed");
+    await updateDoc(doc(db,"sellers",d.sellerPhone,"deals",d.id), { status:"RELEASED", releasedAt:new Date(), payout:j.payout });
+    toast("Paid " + N(j.payout));
+    payView({...d, status:"RELEASED"});
+  }catch(e){ toast(e.message); btn.textContent = orig; btn.disabled = false; }
 }
-document.addEventListener("click",async(e)=>{const t=e.target.closest("[data-a]");if(!t)return;const a=t.dataset.a;if(a==="again") sellView();if(a==="create") createDeal();if(a==="copy"){const el=$("#lk");el.select();document.execCommand("copy");toast("Copied");}if(a==="pay") handlePay();if(a==="rel") handleRelease(t);if(a==="dsp"){if(confirm("Report problem?")){try{await updateDoc(doc(db,"sellers",currentDeal.sellerPhone,"deals",currentDeal.id),{status:"DISPUTED"});toast("Disputed");payView({...currentDeal,status:"DISPUTED"});}catch(err){toast(err.message);}}}});
-document.addEventListener("input",(e)=>{if(e.target.id==="ac"||e.target.id==="bk") resolveAcct();if(e.target.id==="am"){const v=Number(e.target.value||0);const el=$("#fee");if(el) el.textContent=v ? "You receive: ₦"+(v - v*0.03).toLocaleString() : "You receive 97%";}});
+document.addEventListener("click", async(e)=>{
+  const t = e.target.closest("[data-a]"); if(!t) return;
+  const a = t.dataset.a;
+  if(a === "again") sellView();
+  if(a === "create") createDeal();
+  if(a === "copy"){ const el = $("#lk"); el.select(); document.execCommand("copy"); toast("Copied"); }
+  if(a === "pay") handlePay();
+  if(a === "rel") handleRelease(t);
+  if(a === "dsp"){ if(confirm("Report problem?")){ try{ await updateDoc(doc(db,"sellers",currentDeal.sellerPhone,"deals",currentDeal.id), { status:"DISPUTED" }); toast("Disputed"); payView({...currentDeal, status:"DISPUTED"}); }catch(err){ toast(err.message); } } }
+});
+document.addEventListener("input", (e)=>{
+  if(e.target.id === "ac" || e.target.id === "bk") resolveAcct();
+  if(e.target.id === "am"){ const v = Number(e.target.value||0); const el = $("#fee"); if(el) el.textContent = v ? "You receive: " + N(v - v*0.03) : "Enter price - you will receive 97%"; }
+});
+if(PAY){
+  try{
+    const snap = await getDoc(doc(db,"sellers",PAY[1],"deals",PAY[2]));
+    if(snap.exists()) payView({ id:snap.id, ...snap.data() }); else payView(null);
+  }catch{ payView(null); }
+} else { sellView(); }
+</script>
+</body>
+</html>bk") resolveAcct();if(e.target.id==="am"){const v=Number(e.target.value||0);const el=$("#fee");if(el) el.textContent=v ? "You receive: ₦"+(v - v*0.03).toLocaleString() : "You receive 97%";}});
 if(PAY){try{const snap=await getDoc(doc(db,"sellers",PAY[1],"deals",PAY[2]));if(snap.exists()) payView({id:snap.id,...snap.data()}); else payView(null);}catch{payView(null);}} else {sellView();}
 </script>
 </body>
