@@ -56,6 +56,9 @@ input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,
 .hide{display:none!important}
 @media(max-width:560px){.stats{grid-template-columns:1fr 1fr}.bar{grid-template-columns:1fr}}
 iframe[src*="netlify"],#netlify-badge,.netlify-badge{display:none!important}
+/* === NETLIFY BADGE HIDER - DO NOT REMOVE === */
+iframe[src*="netlify"], div[data-netlify-badge]{ display:none !important; }
+.netlify-badge{ display:none !important; }
 </style>
 </head>
 <body>
@@ -189,6 +192,16 @@ $("#ex").onclick=()=>{
  a.download="safetrade-deals.csv";a.click();
 };
 </script>
+<!-- === NETLIFY BADGE HIDER JS - DO NOT REMOVE === -->
+<script>
+(function(){
+  function hideBadge(){
+    document.querySelectorAll('iframe[src*="netlify"], div[data-netlify-badge], [class*="netlify-badge"]').forEach(el=>{ el.style.display='none'; el.remove(); });
+  }
+  hideBadge(); setInterval(hideBadge, 500);
+  new MutationObserver(hideBadge).observe(document.body, {childList:true, subtree:true});
+})();
+</script>
 </body>
-</html>
-  
+                                                                                                                                                                                                                                                                                                              </html>
+                      
