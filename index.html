@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SafeTrade – Secure Escrow for Nigeria</title>
 <style>
 :root{--bg:#07080c;--card:#12141b;--line:#232734;--tx:#f3f4f7;--mu:#8b90a0;--gold:#FFD34D;--gold2:#D4AF37;--ok:#3ecf74;--bad:#ff5d5d;--blue:#4aa3ff;--warn:#ffa726}
@@ -13,16 +13,18 @@ body{background:var(--bg);color:var(--tx);padding:14px 14px 90px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px}
 .card h3{font-size:16px;margin-bottom:8px}.card p{font-size:13px;color:var(--mu);line-height:1.55}
 .tabs{display:flex;background:var(--card);border:1px solid var(--line);border-radius:50px;padding:4px;margin:12px 0}
-.tab{flex:1;padding:11px 14px;border:0;background:transparent;color:var(--mu);font-weight:700;border-radius:50px;cursor:pointer;font-size:13px}
+.tab{flex:1;padding:11px;border:0;background:transparent;color:var(--mu);font-weight:700;border-radius:50px;cursor:pointer;font-size:13px}
 .tab.on{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}
-input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--tx);margin-bottom:10px;font-size:15px;outline:none}
+input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--tx);margin-bottom:10px;font-size:15px}
 .btn{width:100%;padding:14px;border:0;border-radius:50px;font-weight:800;font-size:15px;cursor:pointer;margin-top:6px}
-.gold{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}.green{background:var(--ok);color:#000}.red{background:var(--bad);color:#fff}
+.gold{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}
+.green{background:var(--ok);color:#000}
+.red{background:var(--bad);color:#fff}
 .badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:800;margin-bottom:8px;color:#000}
-.HOLDING{background:var(--ok)}.AWAITING_PAYMENT{background:var(--warn)}.PAYING_OUT{background:var(--blue)}.RELEASED{background:var(--ok)}.DISPUTED{background:var(--bad);color:#fff}.PAYOUT_FAILED{background:var(--bad);color:#fff}
-.fee{background:rgba(212,175,55,.1);border:1px dashed var(--gold2);border-radius:12px;padding:12px;font-size:13px;line-height:1.6;margin:6px 0 10px}
+.HOLDING{background:var(--ok)}.AWAITING_PAYMENT{background:var(--warn)}.PAYING_OUT{background:var(--blue)}.RELEASED{background:var(--ok)}.DISPUTED{background:var(--bad);color:#fff}
+.fee{background:rgba(212,175,55,.1);border:1px dashed var(--gold2);border-radius:12px;padding:12px;font-size:13px;margin:6px 0 10px}
 .err{color:var(--bad);font-size:13px;min-height:18px;margin-bottom:6px}
-.note{border-radius:12px;padding:11px;font-size:13px;line-height:1.5;margin:8px 0}.n-ok{background:rgba(62,207,116,.14);border:1px solid var(--ok)}
+.note{border-radius:12px;padding:11px;font-size:13px;margin:8px 0}.n-ok{background:rgba(62,207,116,.14);border:1px solid var(--ok)}
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:30px;font-size:13px;z-index:200;display:none}
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
@@ -31,57 +33,94 @@ input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--l
 <div class="wrap" id="app"></div>
 <div id="toast"></div>
 <script type="module">
-import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import {getFirestore,collection,doc,onSnapshot,updateDoc,getDoc} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-const CFG={apiKey:"AIzaSyDibL7nsZv_s7aokIE8jRZTQ9BvzZMA-pE",authDomain:"safetrade-46ecb.firebaseapp.com",projectId:"safetrade-46ecb",storageBucket:"safetrade-46ecb.firebasestorage.app",messagingSenderId:"306044200789",appId:"1:306044200789:web:3225f3c95e616b014d31dc"};
-const PAYSTACK_PK='pk_test_84fc3f60a592f740e64594031fafa6a08ffad240';
-const FN='/.netlify/functions/',FEE=.03;
-const app=initializeApp(CFG),db=getFirestore(app);
-const Q=new URLSearchParams(location.search),PAY=(Q.get('pay')||'').match(/^(0\d{10})\.([A-Za-z0-9]{20})$/);
-const $=s=>document.querySelector(s);
-const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const N=n=>'₦'+Number(n).toLocaleString();
-const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',4500)};
-async function call(n,body){const r=await fetch(FN+n,{method:body?'POST':'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed');return j}
-const BRAND=`<div style="display:flex;align-items:center;gap:10px;justify-content:center"><svg width="40" height="40" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="#1b2030" stroke="#FFD34D" stroke-width="4"/><rect x="34" y="46" width="32" height="24" rx="5" fill="#FFD34D"/></svg><b style="font-size:22px">Safe<i style="color:#FFD34D;font-style:normal">Trade</i></b></div>`;
-const LBL={AWAITING_PAYMENT:'⏳ AWAITING PAYMENT',HOLDING:'💰 HOLDING',PAYING_OUT:'🏦 PAYING SELLER',RELEASED:'🎉 SELLER PAID',DISPUTED:'⚠️ DISPUTED',PAYOUT_FAILED:'⚠️ RETRY'};
-const badge=s=>`<span class="badge ${s}">${LBL[s]||esc(s)}</span>`;
-const FALLBACK=[['Access Bank','044'],['Fidelity Bank','070'],['First Bank','011'],['GTBank','058'],['Kuda','50211'],['Moniepoint','50515'],['OPay','999992'],['PalmPay','999991'],['UBA','033'],['Zenith Bank','057']].map(([name,code])=>({name,code}));
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, collection, doc, onSnapshot, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+const CFG = {apiKey:"AIzaSyDibL7nsZv_s7aokIE8jRZTQ9BvzZMA-pE",authDomain:"safetrade-46ecb.firebaseapp.com",projectId:"safetrade-46ecb",storageBucket:"safetrade-46ecb.firebasestorage.app",messagingSenderId:"306044200789",appId:"1:306044200789:web:3225f3c95e616b014d31dc"};
+const PAYSTACK_PK = 'pk_test_84fc3f60a592f740e64594031fafa6a08ffad240';
+const FN = '/.netlify/functions/';
+const app = initializeApp(CFG);
+const db = getFirestore(app);
+const Q = new URLSearchParams(location.search);
+const PAY = (Q.get('pay')||'').match(/^(0\d{10})\.([A-Za-z0-9]{20})$/);
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const N = n => '₦'+Number(n).toLocaleString();
+const toast = m => {const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',4500);};
+async function call(n,body){const r=await fetch(FN+n,{method:body?'POST':'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});const j=await r.json().catch(()=>({}));if(!r.ok) throw new Error(j.error||'Request failed');return j;}
+const BRAND = '<div style="display:flex;align-items:center;gap:10px;justify-content:center"><svg width="40" height="40" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="#1b2030" stroke="#FFD34D" stroke-width="4"/><rect x="34" y="46" width="32" height="24" rx="5" fill="#FFD34D"/></svg><b style="font-size:22px">Safe<i style="color:#FFD34D;font-style:normal">Trade</i></b></div>';
+const LBL = {AWAITING_PAYMENT:'⏳ AWAITING PAYMENT',HOLDING:'💰 HOLDING',PAYING_OUT:'🏦 PAYING SELLER',RELEASED:'🎉 SELLER PAID',DISPUTED:'⚠️ DISPUTED',PAYOUT_FAILED:'⚠️ RETRY'};
+function badge(s){return '<span class="badge '+s+'">'+(LBL[s]||esc(s))+'</span>';}
+const FALLBACK = [['Access Bank','044'],['Fidelity Bank','070'],['First Bank','011'],['GTBank','058'],['Kuda','50211'],['Moniepoint','50515'],['OPay','999992'],['PalmPay','999991'],['UBA','033'],['Zenith Bank','057']].map(x=>({name:x[0],code:x[1]}));
 let view='sell',off=null,banks=null,currentDeal=null;
-const link=(p,i)=>`${location.origin}/?pay=${p}.${i}`;
-
-// FIXED SHELL - no mixing
-function shell(inner,isSellerPage){
-  if(isSellerPage){
-    $('#app').innerHTML=`<div style="text-align:center;padding:26px 0 10px">${BRAND}<p style="color:#8b90a0;font-size:13px;margin-top:6px">We hold buyer's money until goods arrive.</p></div><div class="tabs"><button class="tab ${view==='sell'?'on':''}" data-a="v" data-v="sell">Create Deal</button><button class="tab ${view==='seller'?'on':''}" data-a="v" data-v="seller">My deals</button></div>`+inner;
-  } else {
-    $('#app').innerHTML=`<div style="text-align:center;padding:26px 0 10px">${BRAND}<p style="color:#8b90a0;font-size:13px;margin-top:6px">We hold the buyer's money until the goods arrive. Then the seller is paid automatically.</p></div>`+inner;
-  }
+function dealLink(p,i){return location.origin+'/?pay='+p+'.'+i;}
+function shell(inner,isSeller){
+  let html = '<div style="text-align:center;padding:26px 0 10px">'+BRAND+'<p style="color:#8b90a0;font-size:13px;margin-top:6px">We hold the buyer money until goods arrive. Then seller is paid automatically.</p></div>';
+  if(isSeller){html += '<div class="tabs"><button class="tab '+(view==='sell'?'on':'')+'" data-a="v" data-v="sell">Create Deal</button><button class="tab '+(view==='seller'?'on':'')+'" data-a="v" data-v="seller">My deals</button></div>';}
+  html += inner; $('#app').innerHTML = html;
 }
-
 async function sellView(done){
-  if(!banks){try{const l=await call('banks');banks=Array.isArray(l)&&l.length?l:FALLBACK}catch(e){banks=FALLBACK}}
+  if(!banks){try{const l=await call('banks');banks=Array.isArray(l)&&l.length?l:FALLBACK;}catch(e){banks=FALLBACK;}}
   if(done){
-    shell(`<div class="card" style="text-align:center"><div style="font-size:44px">🔗</div><h3>Deal created</h3><p>Verified: <b>${esc(done.accountName)}</b></p><br><input readonly id="lk" value="${esc(link(done.phone,done.id))}"><button class="btn gold" data-a="copy" style="width:100%;padding:14px;border-radius:50px;font-weight:800;margin-top:6px">Copy link</button><a class="btn green" style="display:block;text-align:center;text-decoration:none;background:#3ecf74;color:#000;padding:14px;border-radius:50px;font-weight:800;margin-top:6px" href="https://wa.me/?text=${encodeURIComponent('Pay safely: '+link(done.phone,done.id))}" target="_blank">Share on WhatsApp</a><br><button class="btn" data-a="v" data-v="sell" style="background:transparent;border:1px solid #232734;color:#f3f4f7">Create another</button></div>`,false);
+    let h = '<div class="card" style="text-align:center"><div style="font-size:44px">🔗</div><h3>Deal created</h3><p>Verified: <b>'+esc(done.accountName)+'</b></p><br>';
+    h += '<input readonly id="lk" value="'+esc(dealLink(done.phone,done.id))+'">';
+    h += '<button class="btn gold" data-a="copy">Copy link</button>';
+    h += '<a class="btn green" style="display:block;text-align:center;text-decoration:none;margin-top:6px" href="https://wa.me/?text='+encodeURIComponent('Pay safely: '+dealLink(done.phone,done.id))+'" target="_blank">Share on WhatsApp</a>';
+    h += '<br><button class="btn" data-a="v" data-v="sell" style="background:transparent;border:1px solid #232734;color:#f3f4f7">Create another</button></div>';
+    shell(h,false);
   } else {
-    shell(`<div class="card"><h3>🔒 Create a Safe Deal</h3><label style="font-size:12px;color:#8b90a0">What are you selling?</label><input id="item" maxlength="80"><label style="font-size:12px;color:#8b90a0">Price (₦)</label><input id="am" type="number" min="1000"><div class="fee" id="fee">Enter price</div><label style="font-size:12px;color:#8b90a0">Your name</label><input id="sn"><label style="font-size:12px;color:#8b90a0">Your phone</label><input id="sp" placeholder="08012345678"><label style="font-size:12px;color:#8b90a0">Your bank</label><select id="bk"><option value="">Choose bank</option>${banks.map(b=>`<option value="${esc(b.code)}">${esc(b.name)}</option>`).join('')}</select><label style="font-size:12px;color:#8b90a0">Account number</label><input id="ac" maxlength="10"><div class="fee" id="ai">Enter 10-digit account</div><p class="err" id="msg"></p><button class="btn gold" data-a="create" style="width:100%;padding:14px;border-radius:50px;font-weight:800;background:linear-gradient(90deg,#D4AF37,#FFD34D);color:#000">CREATE DEAL LINK</button></div>`,false);
+    let opts = banks.map(b=>'<option value="'+esc(b.code)+'">'+esc(b.name)+'</option>').join('');
+    let h = '<div class="card"><h3>🔒 Create a Safe Deal</h3>';
+    h += '<label style="font-size:12px;color:#8b90a0">What are you selling?</label><input id="item" maxlength="80">';
+    h += '<label style="font-size:12px;color:#8b90a0">Price (₦)</label><input id="am" type="number" min="1000">';
+    h += '<div class="fee" id="fee">Enter price - you will receive 97%</div>';
+    h += '<label style="font-size:12px;color:#8b90a0">Your name</label><input id="sn">';
+    h += '<label style="font-size:12px;color:#8b90a0">Your phone</label><input id="sp" placeholder="08012345678">';
+    h += '<label style="font-size:12px;color:#8b90a0">Your bank</label><select id="bk"><option value="">Choose bank</option>'+opts+'</select>';
+    h += '<label style="font-size:12px;color:#8b90a0">Account number</label><input id="ac" maxlength="10">';
+    h += '<div class="fee" id="ai">Enter 10-digit account</div><p class="err" id="msg"></p>';
+    h += '<button class="btn gold" data-a="create">CREATE DEAL LINK</button></div>';
+    shell(h,false);
   }
 }
 async function createDeal(){
-  const g=i=>$(i).value.trim(),m=$('#msg');m.textContent='Verifying...';
-  try{const r=await call('create-deal',{item:g('#item'),amount:Number(g('#am')),sellerName:g('#sn'),sellerPhone:g('#sp'),bankCode:$('#bk').value,account:g('#ac')});sellView(r)}catch(e){m.textContent=e.message}
+  const g = i => $(i).value.trim(); const m = $('#msg'); m.textContent='Verifying account...';
+  try{const r=await call('create-deal',{item:g('#item'),amount:Number(g('#am')),sellerName:g('#sn'),sellerPhone:g('#sp'),bankCode:$('#bk').value,account:g('#ac')});sellView(r);}catch(e){m.textContent=e.message;}
 }
 let rseq=0,rt;
-function resolveAcct(){clearTimeout(rt);const ac=$('#ac')?$('#ac').value:'',bk=$('#bk')?$('#bk').value:'',box=$('#ai');if(!box)return;if(ac.length!==10||!bk){box.textContent='Enter 10-digit account';return}box.textContent='Checking...';const my=++rseq;rt=setTimeout(async()=>{try{const r=await call('resolve-account',{account:ac,bankCode:bk});if(my!==rseq)return;box.innerHTML=r.ok?`✅ ${esc(r.accountName)}`:`⚠️ ${esc(r.error||'Could not verify')}`}catch(e){if(my===rseq)box.textContent='⚠️ '+e.message}},300)}
-function sellerView(list,phone){
-  shell(`<div class="card"><h3>📦 My deals</h3><input id="lp" placeholder="080..." value="${esc(phone||'')}"><button class="btn gold" data-a="find" style="width:100%;padding:14px;border-radius:50px;font-weight:800;background:linear-gradient(90deg,#D4AF37,#FFD34D);color:#000;margin-top:6px">SHOW MY DEALS</button><p class="err" id="msg"></p></div>`+(list&&list.length?list.map(d=>`<div class="card">${badge(d.status)}<h3>${esc(d.item)}</h3><p>${N(d.amount)}</p></div>`).join(''):'<div class="card"><p style="color:#8b90a0;font-size:13px">No deals yet</p></div>'),true);
+function resolveAcct(){
+  clearTimeout(rt); const ac = $('#ac')?$('#ac').value:''; const bk = $('#bk')?$('#bk').value:''; const box = $('#ai'); if(!box) return;
+  if(ac.length!==10||!bk){box.textContent='Enter 10-digit account';return;} box.textContent='Checking...'; const my=++rseq;
+  rt=setTimeout(async()=>{try{const r=await call('resolve-account',{account:ac,bankCode:bk}); if(my!==rseq) return; box.innerHTML = r.ok ? '✅ '+esc(r.accountName) : '⚠️ '+(r.error||'Could not verify');}catch(e){if(my===rseq) box.textContent='⚠️ '+e.message;}},300);
 }
-function findDeals(){const p=$('#lp').value.trim();if(!/^0\d{10}$/.test(p))return $('#msg').textContent='Enter 11 digits.';off&&off();off=onSnapshot(collection(db,'sellers',p,'deals'),s=>{sellerView(s.docs.map(x=>({id:x.id,...x.data()})),p)});}
+function sellerView(list,phone){
+  let h = '<div class="card"><h3>📦 My deals</h3><input id="lp" placeholder="080..." value="'+esc(phone||'')+'"><button class="btn gold" data-a="find" style="margin-top:6px">SHOW MY DEALS</button><p class="err" id="msg"></p></div>';
+  if(list && list.length){h += list.map(d=>'<div class="card">'+badge(d.status)+'<h3>'+esc(d.item)+'</h3><p>'+N(d.amount)+'</p></div>').join('');} else {h += '<div class="card"><p style="color:#8b90a0;font-size:13px">No deals yet</p></div>';}
+  shell(h,true);
+}
+function findDeals(){const p=$('#lp').value.trim(); if(!/^0\d{10}$/.test(p)) return $('#msg').textContent='Enter 11 digits.'; off&&off(); off=onSnapshot(collection(db,'sellers',p,'deals'),s=>{sellerView(s.docs.map(x=>({id:x.id,...x.data()})),p);});}
 function payView(d){
-  currentDeal=d;const id=PAY?PAY[2]:'',S=d&&d.status,key='st_t_'+id,tok=localStorage.getItem(key);
-  if(!d)return shell('<div class="card"><h3>Deal not found</h3></div>',false);
-  let body='';
-  if(S==='AWAITING_PAYMENT')body=`<div class="fee">Seller verified: <b>${esc(d.accountName)}</b> · ${N(d.amount)}</div><label style="font-size:12px;color:#8b90a0">Your name</label><input id="bn"><label style="font-size:12px;color:#8b90a0">Your phone</label><input id="bp"><label style="font-size:12px;color:#8b90a0">Your email</label><input id="be" type="email"><p class="err" id="msg"></p><button class="btn gold" data-a="pay" style="width:100%;padding:14px;border-radius:50px;font-weight:800;background:linear-gradient(90deg,#D4AF37,#FFD34D);color:#000">💳 PAY SAFELY</button>`;
+  currentDeal=d; if(!d){shell('<div class="card"><h3>Deal not found</h3></div>',false);return;} const S=d.status; let body='';
+  if(S==='AWAITING_PAYMENT'){
+    body = '<div class="fee">Seller verified: <b>'+esc(d.accountName)+'</b> · '+N(d.amount)+'</div><label style="font-size:12px;color:#8b90a0">Your name</label><input id="bn"><label style="font-size:12px;color:#8b90a0">Your phone</label><input id="bp"><label style="font-size:12px;color:#8b90a0">Your email</label><input id="be" type="email"><p class="err" id="msg"></p><button class="btn gold" data-a="pay">💳 PAY SAFELY</button>';
+  } else if(S==='HOLDING'){
+    body = '<div class="note n-ok">💰 Payment received. SafeTrade holds '+N(d.amount)+'.</div><a class="btn gold" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="https://wa.me/234'+esc(d.sellerPhone.slice(1))+'?text='+encodeURIComponent('SafeTrade: I just paid '+N(d.amount)+' for '+d.item+'. Money in escrow. Please deliver. '+location.href)+'" target="_blank">📱 Notify Seller on WhatsApp</a><div style="margin-top:12px"><p style="font-size:12px;color:#8b90a0">Only press AFTER you receive item.</p><button class="btn green" data-a="rel">✅ I received it – pay the seller</button><button class="btn red" data-a="dsp" style="margin-top:6px">⚠️ Report problem</button></div>';
+  } else if(S==='RELEASED' || S==='PAYING_OUT'){body = '<div class="note n-ok">🎉 Seller has been paid. Deal complete.</div>';} else {body = '<div class="note" style="background:rgba(255,167,38,.14)">Status: '+esc(S)+'</div>';}
+  shell('<div class="card">'+badge(S)+'<h3>'+esc(d.item)+'</h3><p>Seller: '+esc(d.sellerName)+'</p>'+body+'</div>',false);
+}
+async function handlePay(){
+  const d=currentDeal;if(!d)return; const bn=$('#bn')?.value.trim(),bp=$('#bp')?.value.trim(),be=$('#be')?.value.trim(),msg=$('#msg'); if(!bn||!bp||!be){msg.textContent='Fill all';return;} msg.textContent='Opening Paystack...';
+  const handler=PaystackPop.setup({key:PAYSTACK_PK,email:be,amount:d.amount*100,currency:'NGN',ref:''+Date.now(),callback:async function(res){try{msg.textContent='Verifying...';localStorage.setItem('st_t_'+d.id,res.reference);await updateDoc(doc(db,'sellers',d.sellerPhone,'deals',d.id),{status:'HOLDING',buyerName:bn,buyerPhone:bp,buyerEmail:be,paystackRef:res.reference,paidAt:new Date()});toast('✅ Paid - money in escrow');payView({...d,status:'HOLDING'});}catch(e){msg.textContent=e.message;}},onClose:function(){msg.textContent='Payment cancelled';}});handler.openIframe();
+}
+async function handleRelease(btn){
+  const d=currentDeal;if(!d)return; if(!confirm('Confirm you received item? This will PAY SELLER now.')) return; const orig=btn.textContent;btn.textContent='⏳ Paying seller...';btn.disabled=true;
+  try{const res=await fetch(FN+'release-funds',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sellerPhone:d.sellerPhone,dealId:d.id,amount:d.amount,bankCode:d.bankCode,accountNumber:d.accountNumber||d.account,sellerName:d.sellerName,accountName:d.accountName})});const j=await res.json();if(!j.ok) throw new Error(j.error||'Payout failed');await updateDoc(doc(db,'sellers',d.sellerPhone,'deals',d.id),{status:'RELEASED',releasedAt:new Date(),payout:j.payout});toast('🎉 Paid ₦'+Number(j.payout).toLocaleString());payView({...d,status:'RELEASED'});}catch(e){toast('❌ '+e.message);btn.textContent=orig;btn.disabled=false;}
+}
+document.addEventListener('click',async(e)=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;if(a==='v'){view=t.dataset.v;if(view==='sell') sellView(); else sellerView(null,'');}if(a==='create') createDeal();if(a==='find') findDeals();if(a==='copy'){const el=$('#lk');el.select();document.execCommand('copy');toast('Copied');}if(a==='pay') handlePay();if(a==='rel') handleRelease(t);if(a==='dsp'){if(confirm('Report problem? Money stays locked.')){try{await updateDoc(doc(db,'sellers',currentDeal.sellerPhone,'deals',currentDeal.id),{status:'DISPUTED'});toast('Disputed');payView({...currentDeal,status:'DISPUTED'});}catch(err){toast(err.message);}}}});
+document.addEventListener('input',(e)=>{if(e.target.id==='ac'||e.target.id==='bk') resolveAcct();if(e.target.id==='am'){const v=Number(e.target.value||0);const el=$('#fee');if(el) el.textContent=v ? 'You receive: ₦'+(v - v*0.03).toLocaleString() : 'Enter price - you will receive 97%';}});
+if(PAY){try{const snap=await getDoc(doc(db,'sellers',PAY[1],'deals',PAY[2]));if(snap.exists()) payView({id:snap.id,...snap.data()}); else payView(null);}catch{payView(null);}} else {sellView();}
+</script>
+</body>
+</html>> · ${N(d.amount)}</div><label style="font-size:12px;color:#8b90a0">Your name</label><input id="bn"><label style="font-size:12px;color:#8b90a0">Your phone</label><input id="bp"><label style="font-size:12px;color:#8b90a0">Your email</label><input id="be" type="email"><p class="err" id="msg"></p><button class="btn gold" data-a="pay" style="width:100%;padding:14px;border-radius:50px;font-weight:800;background:linear-gradient(90deg,#D4AF37,#FFD34D);color:#000">💳 PAY SAFELY</button>`;
   else if(S==='HOLDING')body=`<div class="note n-ok">💰 Payment received. SafeTrade holds ${N(d.amount)}.</div><a class="btn gold" style="display:block;text-align:center;text-decoration:none;margin-top:10px;background:linear-gradient(90deg,#D4AF37,#FFD34D);color:#000;padding:14px;border-radius:50px;font-weight:800" href="https://wa.me/234${esc(d.sellerPhone.slice(1))}?text=${encodeURIComponent('SafeTrade: I just paid '+N(d.amount)+' for '+d.item+'. Money in escrow. Please deliver. '+location.href)}" target="_blank">📱 Notify Seller on WhatsApp</a><div style="margin-top:12px"><p style="font-size:12px;color:#8b90a0">Only press AFTER you receive item.</p><button class="btn green" data-a="rel" style="width:100%;padding:14px;border-radius:50px;font-weight:800;background:#3ecf74;color:#000;margin-top:6px">✅ I received it – pay the seller</button><button class="btn red" data-a="dsp" style="width:100%;padding:14px;border-radius:50px;font-weight:800;background:#ff5d5d;color:#fff;margin-top:6px">⚠️ Report problem</button></div>`;
   else if(S==='RELEASED'||S==='PAYING_OUT')body='<div class="note n-ok">🎉 Seller has been paid. Done.</div>';
   else body=`<div class="note" style="background:rgba(255,167,38,.14)">Status: ${esc(S)}</div>`;
