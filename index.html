@@ -96,6 +96,72 @@ function shell(inner,tabs){$('#app').innerHTML=`<div class="hero" style="padding
 
 /* ---------- SELLER: create deal ---------- */
 async function sellView(done){
+  if(!banks){try{const r=await call('banks');banks=r.data||r||[];if(!Array.isArray(banks))banks=Object.values(r).find(Array.isArray)||[];}catch(e){banks=[]}}
+  shell(done?`<div class="card" style="text-align:center"><div style="font-size:44px">🔗</div><h3>Deal created</h3><p>Verified account: <b>${esc(done.accountName)}</b><br>Send this link to your buyer. They pay SafeTrade; we hold it.</p><br><input readonly id="lk" value="${esc(link(done.phone,done.id))}"><button class="btn gold" data-a="copy">Copy link</button><a class="btn green" style="display:block;text-align:center;text-decoration:none" href="https://wa.me/?text=${encodeURIComponent('Pay safely through SafeTrade: '+link(done.phone,done.id))}" target="_blank" rel="noopener">Share on WhatsApp</a></div>`:
+  `<div class="card"><h3>🔒 Create a Safe Deal</h3><p>You are the seller. Enter where you want to be paid. Money is sent to this account automatically after the buyer confirms delivery.</p><br><label>What are you selling?</label><input id="item" maxlength="80"><label>Price (₦)</label><input id="am" type="number" min="1000" max="50000000"><div class="fee" id="fee">Enter price to see what you receive</div><label>Your name</label><input id="sn" maxlength="60"><label>Your phone</label><input id="sp" inputmode="numeric" maxlength="11" placeholder="08012345678"><label>Your bank</label><select id="bk"><option value="">Choose bank</option>${banks.map(b=>`<option value="${esc(b.code)}">${esc(b.name)}</option>`).join('')}</select><label>Account number</label><input id="ac" inputmode="numeric" maxlength="10"><p class="err" id="msg"></p><button class="btn gold" data-a="create">CREATE DEAL LINK</button></div>`,true);
+}
+async function createDeal(){
+  const g=i=>$(i).value.trim(),m=$('#msg');m.textContent='Verifying your bank account…';
+  try{const r=await call('create-deal',{item:g('#item'),amount:Number(g('#am')),sellerName:g('#sn'),sellerPhone:g('#sp'),bankCode:$('#bk').value,account:g('#ac')});sellView(r)}catch(e){m.textContent=e.message}
+}
+/* ---------- SELLER: my deals ---------- */
+function sellerView(list,phone){
+  shell(`<div class="card"><h3>📦 My deals</h3><input id="lp" inputmode="numeric" maxlength="11" placeholder="Your phone, 08012345678" value="${esc(phone||'')}"><button class="btn gold" data-a="find">SHOW MY DEALS</button><p class="err" id="msg"></p></div>`+(list?list.map(d=>{const S=d.status;return `<div class="card">${badge(S)}<h3>${esc(d.item)}</h3><p>${N(d.amount)} · you receive <b>${N(d.amount-d.fee)}</b>${d.buyerName?`<br>Buyer: ${esc(d.buyerName)}`:''}</p>${S==='AWAITING_PAYMENT'?`<div class="note n-wait">⏳ Buyer has not paid. Do not deliver.</div><input readonly value="${esc(link(d.sellerPhone,d.id))}">`:S==='HOLDING'?'<div class="note n-ok">✅ <b>Payment confirmed automatically.</b> SafeTrade holds the money. Deliver now. When the buyer confirms, you are paid.</div>':S==='PAYING_OUT'?'<div class="note n-ok">🏦 Buyer confirmed. Your payout is on its way.</div>':S==='RELEASED'?'<div class="note n-ok">🎉 Paid to your account.</div>':S==='DISPUTED'||S==='PAYOUT_FAILED'?'<div class="note n-wait">SafeTrade is handling this. No action needed.</div>':'<div class="note n-wait">Closed.</div>'}</div>`}).join('')||'<div class="card"><p>No deals for this number.</p></div>':''),true);
+}
+function findDeals(){
+  const p=$('#lp').value.trim();if(!/^0\d{10}$/.test(p))return $('#msg').textContent='Enter 11 digits.';off&&off();
+  off=onSnapshot(collection(db,'sellers',p,'deals'),s=>{sellerView(s.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)),p)},e=>{sellerView(null,p);$('#msg').textContent=e.code||e.message});
+}
+/* ---------- BUYER: pay link ---------- */
+function payView(d){
+  const id=PAY[2],S=d&&d.status,key='st_t_'+id,tok=localStorage.getItem(key);
+  if(!d)return shell('<div class="card"><h3>Deal not found</h3><p>Check the link you were sent.</p></div>');
+  let body='';
+  if(S==='AWAITING_PAYMENT')body=`<div class="fee">Seller account verified: <b>${esc(d.accountName)}</b> (…${esc(d.acctLast4)})<br>Item: <b>${esc(d.item)}</b><br>Total to pay: <b>${N(d.amount)}</b></div><label>Your name</label><input id="bn" maxlength="60"><label>Your phone</label><input id="bp" inputmode="numeric" maxlength="11"><label>Your email</label><input id="be" type="email" maxlength="80"><p class="err" id="msg"></p><button class="btn gold" data-a="pay">💳 PAY SAFELY (card / transfer)</button>`;
+  else if(S==='HOLDING')body=`<div class="note n-ok">💰 Payment received. SafeTrade holds ${N(d.amount)}. Wait for the seller to deliver.</div>${tok?`<p class="mu">Only press the green button AFTER you receive and check the item. It pays the seller immediately and cannot be undone.</p><button class="btn green" data-a="rel">✅ I received it – pay the seller</button><button class="btn red" data-a="dsp">⚠️ Report a problem</button><p class="mu" style="margin-top:10px">Your release code (keep private): <b>${esc(tok)}</b></p>`:`<label>Release code (saved on the phone you paid with)</label><input id="rc"><button class="btn green" data-a="rel">✅ I received it – pay the seller</button><button class="btn red" data-a="dsp">⚠️ Report a problem</button>`}`;
+  else if(S==='PAYING_OUT'||S==='RELEASED')body='<div class="note n-ok">🎉 Thank you. The seller has been paid. Deal complete.</div>';
+  else if(S==='DISPUTED'||S==='PAYOUT_FAILED')body='<div class="note n-wait">SafeTrade is reviewing this deal. Your money stays safe.</div>';
+  else body=`<div class="note n-wait">This deal is ${esc(LBL[S]||S)}.</div>`;
+  shell(`<div class="card">${badge(S)}<h3>${esc(d.item)}</h3><p>Seller: ${esc(d.sellerName)}</p>${body}</div>`);
+}
+async function startPay(){
+  const g=i=>$(i).value.trim(),m=$('#msg'),d=last;
+  if(g('#bn').length<2)return m.textContent='Enter your name.';
+  if(!/^0\d{10}$/.test(g('#bp')))return m.textContent='Phone must be 11 digits.';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(g('#be')))return m.textContent='Enter a valid email.';
+  if(!window.PaystackPop)return m.textContent='Payment system did not load. Refresh.';
+  const t=hex(crypto.getRandomValues(new Uint8Array(12))),th=await sha(t);localStorage.setItem('st_t_'+PAY[2],t);paid=false;
+  window.PaystackPop.setup({key:PAYSTACK_PK,email:g('#be'),amount:d.amount*100,currency:'NGN',ref:'ST'+Date.now()+Math.floor(Math.random()*1e6),channels:['card','bank','bank_transfer','ussd'],
+    metadata:{path:`sellers/${PAY[1]}/deals/${PAY[2]}`,buyerName:g('#bn'),buyerPhone:g('#bp'),tokenHash:th},
+    callback:function(){paid=true;toast('Payment received. Confirming automatically…')},
+    onClose:function(){setTimeout(()=>{if(!paid)toast('Payment cancelled')},400)}}).openIframe();
+}
+async function buyerAct(action){
+  const tok=localStorage.getItem('st_t_'+PAY[2])||($('#rc')&&$('#rc').value.trim());if(!tok)return toast('Enter your release code.');
+  if(!confirm(action==='release'?'Pay the seller now? This cannot be undone.':'Report a problem and freeze this deal?'))return;
+  try{await call('buyer-action',{path:`sellers/${PAY[1]}/deals/${PAY[2]}`,token:tok,action});toast(action==='release'?'Seller is being paid ✅':'Reported. SafeTrade will review.')}catch(e){toast(e.message)}
+}
+/* ---------- ADMIN ---------- */
+function adminLogin(msg){shell(`<div class="card"><h3>🛡️ Admin sign in</h3><label>Admin email</label><input id="ae" type="email" autocomplete="username"><label>Password</label><input id="ap" type="password" autocomplete="current-password"><button class="btn gold" data-a="alogin">SIGN IN</button><p class="err" id="msg" style="margin-top:10px">${esc(msg||'')}</p></div>`)}
+function adminView(){
+  const held=deals.filter(d=>==='1',PAY=(Q.get('pay')||'').match(/^(0\d{10})\.([A-Za-z0-9]{20})$/);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const N=n=>'₦'+Number(n).toLocaleString();
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',4500)};
+const hex=b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+const sha=async s=>hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)));
+async function call(n,body){const r=await fetch(FN+n,{method:body?'POST':'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed ('+r.status+')');return j}
+const LOGO=s=>`<svg class="shield" width="${s}" height="${s}" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="url(#gd)" stroke="url(#gg)" stroke-width="4" stroke-linejoin="round"/><rect x="34" y="46" width="32" height="24" rx="5" fill="url(#gg)"/><path d="M39 46v-8a11 11 0 0 1 22 0v8" fill="none" stroke="url(#gg)" stroke-width="5" stroke-linecap="round"/></svg>`;
+const BRAND=`<div class="brand">${LOGO(40)}<b>Safe<i>Trade</i></b></div>`;
+const LBL={AWAITING_PAYMENT:'⏳ AWAITING PAYMENT',HOLDING:'💰 HOLDING',PAYING_OUT:'🏦 PAYING SELLER',RELEASED:'🎉 SELLER PAID',DISPUTED:'⚠️ DISPUTED',PAYOUT_FAILED:'⚠️ PAYOUT RETRY',REFUNDED:'↩️ REFUNDED',CANCELLED:'CANCELLED'};
+const badge=s=>`<span class="badge ${s}">${LBL[s]||esc(s)}</span>`;
+let view='sell',off=null,deals=[],banks=null,paid=false,last=null;
+const link=(p,i)=>`${location.origin}/?pay=${p}.${i}`;
+function shell(inner,tabs){$('#app').innerHTML=`<div class="hero" style="padding-bottom:0">${BRAND}<p>${ADMIN?'Administrator console':'We hold the buyer\'s money until the goods arrive. Then the seller is paid automatically.'}</p></div>`+(tabs?`<div class="tabs"><button class="tab ${view==='sell'?'on':''}" data-a="v" data-v="sell">Sell (create deal)</button><button class="tab ${view==='seller'?'on':''}" data-a="v" data-v="seller">My deals</button></div>`:'')+inner}
+
+/* ---------- SELLER: create deal ---------- */
+async function sellView(done){
   if(!banks){try{banks=await call('banks')}catch(e){banks=[]}}
   shell(done?`<div class="card" style="text-align:center"><div style="font-size:44px">🔗</div><h3>Deal created</h3><p>Verified account: <b>${esc(done.accountName)}</b><br>Send this link to your buyer. They pay SafeTrade; we hold it.</p><br><input readonly id="lk" value="${esc(link(done.phone,done.id))}"><button class="btn gold" data-a="copy">Copy link</button><a class="btn green" style="display:block;text-align:center;text-decoration:none" href="https://wa.me/?text=${encodeURIComponent('Pay safely through SafeTrade: '+link(done.phone,done.id))}" target="_blank" rel="noopener">Share on WhatsApp</a></div>`:
   `<div class="card"><h3>🔒 Create a Safe Deal</h3><p>You are the seller. Enter where you want to be paid. Money is sent to this account automatically after the buyer confirms delivery.</p><br><label>What are you selling?</label><input id="item" maxlength="80"><label>Price (₦)</label><input id="am" type="number" min="1000" max="50000000"><div class="fee" id="fee">Enter price to see what you receive</div><label>Your name</label><input id="sn" maxlength="60"><label>Your phone</label><input id="sp" inputmode="numeric" maxlength="11" placeholder="08012345678"><label>Your bank</label><select id="bk"><option value="">Choose bank</option>${banks.map(b=>`<option value="${esc(b.code)}">${esc(b.name)}</option>`).join('')}</select><label>Account number</label><input id="ac" inputmode="numeric" maxlength="10"><p class="err" id="msg"></p><button class="btn gold" data-a="create">CREATE DEAL LINK</button></div>`,true);
