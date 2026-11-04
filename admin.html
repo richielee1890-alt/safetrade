@@ -224,15 +224,28 @@ $("#ex").onclick=()=>{
  a.download="safetrade-deals.csv";a.click();
 };
 </script>
-<!-- === NETLIFY BADGE HIDER JS - DO NOT REMOVE === -->
+<!-- === NETLIFY BADGE KILLER - STRONG === -->
 <script>
 (function(){
-  function hideBadge(){
-    document.querySelectorAll('iframe[src*="netlify"], div[data-netlify-badge], [class*="netlify-badge"]').forEach(el=>{ el.style.display='none'; el.remove(); });
+  function kill(){
+    // 1. Kill by iframe / class / attribute
+    document.querySelectorAll('iframe[src*="netlify"], div[data-netlify-badge], [class*="netlify"], [id*="netlify"]').forEach(el=>el.remove());
+    // 2. Kill by TEXT - this is the one in your screenshot
+    document.querySelectorAll('div, a, span, button').forEach(el=>{
+      if(el.children.length===0 && (el.textContent||'').trim()==='Powered by Netlify'){
+        let p=el;
+        for(let i=0;i<4 && p;i++){ p.style.display='none'; p=p.parentElement; }
+        el.remove();
+      }
+    });
   }
-  hideBadge(); setInterval(hideBadge, 500);
-  new MutationObserver(hideBadge).observe(document.body, {childList:true, subtree:true});
+  kill();
+  setInterval(kill, 300);
+  new MutationObserver(kill).observe(document.documentElement, {childList:true, subtree:true});
 })();
 </script>
+<style>
+  iframe[src*="netlify"], div[data-netlify-badge], [class*="netlify-badge"]{display:none!important}
+</style>
 </body>
 </html>
