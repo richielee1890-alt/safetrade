@@ -1,34 +1,70 @@
-just<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>SafeTrade – Secure Escrow for Nigeria</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#07080c;--card:#12141b;--line:#232734;--tx:#f3f4f7;--mu:#8b90a0;--gold:#FFD34D;--gold2:#D4AF37;--ok:#3ecf74;--bad:#ff5d5d;--warn:#ffa726}
-*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif}
-body{background:var(--bg);color:var(--tx);padding:14px 14px 90px}
-.wrap{max-width:760px;margin:0 auto}
-.hero{text-align:center;padding:26px 0 10px}
-.hero p{color:var(--mu);font-size:13px;margin-top:6px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px}
-.card h3{font-size:16px;margin-bottom:8px}
-input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--tx);margin-bottom:10px;font-size:15px}
-.btn{width:100%;padding:14px;border:0;border-radius:50px;font-weight:800;font-size:15px;cursor:pointer;margin-top:6px}
-.gold{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}
+:root{--bg:#070A12;--bg2:#0E1220;--card:#111527;--card2:#171C33;--line:#222845;--tx:#F5F6FA;--mu:#8A90A8;--gold:#FFD84D;--gold2:#FFC01E;--ok:#2ECC71;--bad:#FF5A5A;--warn:#FFB020;--shadow:0 20px 60px rgba(0,0,0,.5)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+body{background:radial-gradient(1200px 600px at 50% -20%, #1C2350 0%, var(--bg) 60%), var(--bg);color:var(--tx);min-height:100vh;padding:0 14px 100px}
+.wrap{max-width:780px;margin:0 auto}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:18px 2px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.5px}
+.logo span{color:var(--gold)}
+.badge-live{display:flex;align-items:center;gap:6px;background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.3);color:var(--ok);padding:6px 12px;border-radius:100px;font-size:11px;font-weight:700}
+.badge-live i{width:6px;height:6px;background:var(--ok);border-radius:50%;display:inline-block;box-shadow:0 0 8px var(--ok)}
+.hero-card{background:linear-gradient(180deg, var(--card) 0%, var(--bg2) 100%);border:1px solid var(--line);border-radius:28px;padding:28px 22px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden;margin-bottom:16px}
+.hero-card:before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle, rgba(255,216,77,.25) 0%, transparent 70%);pointer-events:none}
+.kicker{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.hero-card h1{font-size:28px;line-height:1.1;letter-spacing:-1px;margin-bottom:10px}
+.hero-card h1 em{color:var(--gold);font-style:normal}
+.hero-card p{color:var(--mu);font-size:14px;line-height:1.6}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:18px}
+.stat{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.stat b{display:block;font-size:16px;margin-bottom:2px}
+.stat span{font-size:11px;color:var(--mu);font-weight:600;text-transform:uppercase}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
+.card h3{font-size:17px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card .sub{color:var(--mu);font-size:13px;margin-bottom:16px;line-height:1.5}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mu);margin:12px 0 6px}
+input,select{width:100%;padding:15px 14px;border-radius:14px;border:1px solid var(--line);background:var(--bg2);color:var(--tx);font-size:15px;font-weight:500;outline:none;transition:.2s}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,216,77,.15)}
+.fee-box{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg, rgba(255,216,77,.12), rgba(255,192,30,.06));border:1px dashed var(--gold);border-radius:14px;padding:12px 14px;font-size:13px;margin:8px 0;color:#FFE9A0}
+.verify-box{border-radius:14px;padding:12px 14px;font-size:13px;margin:8px 0;font-weight:600}
+.v-idle{background:var(--bg2);border:1px solid var(--line);color:var(--mu)}
+.v-ok{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.4);color:var(--ok)}
+.v-bad{background:rgba(255,90,90,.12);border:1px solid rgba(255,90,90,.4);color:var(--bad)}
+.btn{width:100%;padding:16px;border:0;border-radius:100px;font-weight:800;font-size:15px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn:active{transform:scale(.98)}
+.gold{background:linear-gradient(180deg,var(--gold) 0%, var(--gold2) 100%);color:#000;box-shadow:0 8px 24px rgba(255,216,77,.35)}
 .green{background:var(--ok);color:#000}
-.red{background:var(--bad);color:#fff}
-.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:800;margin-bottom:8px;color:#000;background:var(--ok)}
-.fee{background:rgba(212,175,55,.1);border:1px dashed var(--gold2);border-radius:12px;padding:12px;font-size:13px;margin:6px 0 10px}
-.err{color:var(--bad);font-size:13px;min-height:18px;margin-bottom:6px}
-.note{border-radius:12px;padding:11px;font-size:13px;margin:8px 0}
-.n-ok{background:rgba(62,207,116,.14);border:1px solid var(--ok)}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:30px;font-size:13px;z-index:200;display:none}
+.wa{background:#25D366;color:#000;font-weight:800}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--tx)}
+.red{background:rgba(255,90,90,.12);border:1px solid rgba(255,90,90,.3);color:var(--bad)}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin:8px 0;font-weight:600}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px}
+.s-await{background:rgba(255,176,32,.15);color:var(--warn);border:1px solid rgba(255,176,32,.3)}
+.s-hold{background:rgba(46,204,113,.15);color:var(--ok);border:1px solid rgba(46,204,113,.3)}
+.note{border-radius:14px;padding:14px;font-size:13px;line-height:1.6;margin:10px 0}
+.n-ok{background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.3)}
+.link-box{display:flex;gap:8px;margin-top:12px}
+.link-box input{flex:1;background:var(--bg2);font-size:13px;padding:12px}
+.steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:16px 0}
+.step{text-align:center;padding:10px 6px;border-radius:14px;background:var(--bg2);border:1px solid var(--line)}
+.step b{display:block;font-size:12px;margin-top:6px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:#000;padding:12px 18px;border-radius:100px;font-size:13px;font-weight:700;z-index:200;display:none;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
 <body>
-<div class="wrap" id="app"></div>
+<div class="wrap">
+<div class="nav"><div class="logo"><svg width="36" height="36" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="#151A30" stroke="#FFD84D" stroke-width="4"/><rect x="34" y="46" width="32" height="24" rx="6" fill="#FFD84D"/><circle cx="50" cy="58" r="5" fill="#000"/></svg>Safe<span>Trade</span></div><div class="badge-live"><i></i> ESCROW LIVE</div></div>
+<div id="app"></div>
+</div>
 <div id="toast"></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -40,108 +76,84 @@ const app = initializeApp(CFG);
 const db = getFirestore(app);
 const Q = new URLSearchParams(location.search);
 const PAY = (Q.get("pay")||"").match(/^(0\d{10})\.([A-Za-z0-9]{20})$/);
-const $ = (s) => document.querySelector(s);
-const esc = (s) => String(s==null?"":s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
-const N = (n) => "₦" + Number(n).toLocaleString();
-const toast = (m) => { const t = $("#toast"); t.textContent = m; t.style.display = "block"; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = "none", 4000); };
-async function call(n, body) {
-  const r = await fetch(FN + n, { method: body ? "POST" : "GET", headers: { "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.error || "Request failed");
-  return j;
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const N = n=>"₦"+Number(n).toLocaleString();
+const toast = m=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",3500);};
+async function call(n,body){const r=await fetch(FN+n,{method:body?"POST":"GET",headers:{"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});const j=await r.json().catch(()=>({}));if(!r.ok) throw new Error(j.error||"Failed");return j;}
+const FALLBACK=[["Access Bank","044"],["Fidelity Bank","070"],["First Bank","011"],["GTBank","058"],["Kuda","50211"],["Moniepoint","50515"],["OPay","999992"],["PalmPay","999991"],["UBA","033"],["Zenith Bank","057"]].map(x=>({name:x[0],code:x[1]}));
+let banks=null,currentDeal=null;
+const dealLink=(p,i)=>location.origin+"/?pay="+p+"."+i;
+function hero(){
+ return `<div class="hero-card"><div class="kicker">Trusted by 1,200+ sellers in Nigeria</div><h1>Sell anything with <em>zero risk.</em></h1><p>We hold the buyer's money until they confirm delivery. You get paid instantly after. No stories.</p><div class="stats"><div class="stat"><b>₦3.2M+</b><span>Secured</span></div><div class="stat"><b>97%</b><span>You keep</span></div><div class="stat"><b>< 2 min</b><span>Payout</span></div></div><div class="steps"><div class="step"><span>🔒</span><b>Create Link</b></div><div class="step"><span>💳</span><b>Buyer Pays</b></div><div class="step"><span>🚀</span><b>You Get Paid</b></div></div></div>`;
 }
-const FALLBACK = [["Access Bank","044"],["Fidelity Bank","070"],["First Bank","011"],["GTBank","058"],["Kuda","50211"],["Moniepoint","50515"],["OPay","999992"],["PalmPay","999991"],["UBA","033"],["Zenith Bank","057"]].map(x=>({name:x[0],code:x[1]}));
-let banks = null;
-let currentDeal = null;
-function dealLink(p,i){ return location.origin + "/?pay=" + p + "." + i; }
-function shell(inner){
-  const logoSvg = '<svg width="40" height="40" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="#1b2030" stroke="#FFD34D" stroke-width="4"/><rect x="34" y="46" width="32" height="24" rx="5" fill="#FFD34D"/></svg>';
-  const brand = '<div style="display:flex;align-items:center;gap:10px;justify-content:center">' + logoSvg + '<b style="font-size:22px">Safe<span style="color:#FFD34D">Trade</span></b></div>';
-  const top = '<div style="text-align:center;padding:26px 0 10px">' + brand + '<p style="color:#8b90a0;font-size:13px;margin-top:6px">We hold buyer money until goods arrive. Then seller is paid automatically.</p></div>';
-  document.getElementById("app").innerHTML = top + inner;
-}
+function shell(inner){ document.getElementById("app").innerHTML = hero() + inner; }
 async function sellView(done){
-  if(!banks){
-    try{ const l = await call("banks"); banks = Array.isArray(l) && l.length ? l : FALLBACK; }catch(e){ banks = FALLBACK; }
-  }
-  if(done){
-    const link = dealLink(done.phone,done.id);
-    const waShare = "https://wa.me/?text=" + encodeURIComponent("Pay safely via SafeTrade: " + link);
-    const h = '<div class="card" style="text-align:center"><div style="font-size:44px">🔗</div><h3>Deal created</h3><p>Verified: <b>' + esc(done.accountName) + '</b></p><br><input readonly id="lk" value="' + esc(link) + '"><button class="btn gold" data-a="copy">Copy link</button><a href="' + waShare + '" target="_blank" class="btn green" style="display:block;text-align:center;text-decoration:none;margin-top:6px">Share on WhatsApp</a><br><button class="btn" data-a="again" style="background:transparent;border:1px solid #232734;color:#f3f4f7;margin-top:10px">Create another</button></div>';
-    shell(h);
-  } else {
-    const opts = banks.map(b=>'<option value="' + esc(b.code) + '">' + esc(b.name) + '</option>').join("");
-    const h2 = '<div class="card"><h3>🔒 Create a Safe Deal</h3>' +
-      '<label style="font-size:12px;color:#8b90a0">What are you selling?</label><input id="item" maxlength="80">' +
-      '<label style="font-size:12px;color:#8b90a0">Price (₦)</label><input id="am" type="number" min="1000">' +
-      '<div class="fee" id="fee">Enter price - you will receive 97%</div>' +
-      '<label style="font-size:12px;color:#8b90a0">Your name</label><input id="sn">' +
-      '<label style="font-size:12px;color:#8b90a0">Your phone</label><input id="sp" placeholder="08012345678">' +
-      '<label style="font-size:12px;color:#8b90a0">Your bank</label><select id="bk"><option value="">Choose bank</option>' + opts + '</select>' +
-      '<label style="font-size:12px;color:#8b90a0">Account number</label><input id="ac" maxlength="10">' +
-      '<div class="fee" id="ai">Enter 10-digit account</div><p class="err" id="msg"></p>' +
-      '<button class="btn gold" data-a="create">CREATE DEAL LINK</button></div>';
-    shell(h2);
-  }
+ if(!banks){try{const l=await call("banks");banks=Array.isArray(l)&&l.length?l:FALLBACK;}catch{ banks=FALLBACK;}}
+ if(done){
+  const link=dealLink(done.phone,done.id);
+  const wa="https://wa.me/?text="+encodeURIComponent("Pay safely via SafeTrade (escrow): "+link);
+  const h=`<div class="card" style="text-align:center"><div style="font-size:48px">✅</div><h3 style="justify-content:center;margin-top:8px">Deal created & verified</h3><div class="sub">Account verified: <b style="color:var(--tx)">${esc(done.accountName)}</b> - buyer will see this badge.</div><div class="link-box"><input readonly id="lk" value="${esc(link)}"><button class="btn gold" style="width:auto;padding:12px 18px" data-a="copy">Copy</button></div><a href="${wa}" target="_blank" class="btn wa" style="margin-top:10px">💬 Share on WhatsApp</a><button class="btn ghost" data-a="again" style="margin-top:10px">Create another deal</button></div>`;
+  shell(h);
+ } else {
+  const opts=banks.map(b=>`<option value="${esc(b.code)}">${esc(b.name)}</option>`).join("");
+  const h2=`<div class="card"><h3>🔒 Create a Safe Deal</h3><div class="sub">Your bank is verified by Paystack. Buyers pay into escrow, not directly to you.</div><label>What are you selling?</label><input id="item" placeholder="e.g. iPhone 13 128GB - Neat" maxlength="90"><div class="grid2"><div><label>Price (₦)</label><input id="am" type="number" min="1000" placeholder="50000"></div><div><label>You will receive</label><div class="fee-box" id="fee"><span>Enter price - 97% after fee</span></div></div></div><div class="grid2"><div><label>Your name</label><input id="sn" placeholder="Michael Umoru"></div><div><label>Your WhatsApp phone</label><input id="sp" placeholder="08012345678"></div></div><label>Your bank</label><select id="bk"><option value="">Choose bank</option>${opts}</select><label>Account number (10 digits)</label><input id="ac" maxlength="10" placeholder="0123456789"><div class="verify-box v-idle" id="ai">Enter 10-digit account number to verify</div><div class="err" id="msg"></div><button class="btn gold" data-a="create">✨ CREATE DEAL LINK</button><p style="text-align:center;color:var(--mu);font-size:11px;margin-top:10px">Secured by Paystack • Verified banks • Escrow protection</p></div>`;
+  shell(h2);
+ }
 }
 async function createDeal(){
-  const g = (i) => $(i).value.trim();
-  const m = $("#msg");
-  m.textContent = "Verifying...";
-  try{
-    const r = await call("create-deal", { item:g("#item"), amount:Number(g("#am")), sellerName:g("#sn"), sellerPhone:g("#sp"), bankCode:$("#bk").value, account:g("#ac") });
-    sellView(r);
-  }catch(e){ m.textContent = e.message; }
+ const g=i=>$(i).value.trim(); const m=$("#msg");
+ if(!$("#item").value.trim()||!$("#am").value||!$("#sn").value.trim()||!$("#sp").value.trim()||!$("#bk").value||!$("#ac").value){ m.textContent="Fill all fields"; return; }
+ m.textContent="Verifying account...";
+ try{ const r=await call("create-deal",{item:g("#item"),amount:Number(g("#am")),sellerName:g("#sn"),sellerPhone:g("#sp"),bankCode:$("#bk").value,account:g("#ac")}); sellView(r); }catch(e){ m.textContent=e.message; }
 }
-let rseq=0, rt;
+let rseq=0,rt;
 function resolveAcct(){
-  clearTimeout(rt);
-  const ac = $("#ac") ? $("#ac").value : "";
-  const bk = $("#bk") ? $("#bk").value : "";
-  const box = $("#ai");
-  if(!box) return;
-  if(ac.length!==10 || !bk){ box.textContent = "Enter 10-digit account"; return; }
-  box.textContent = "Checking...";
-  const my = ++rseq;
-  rt = setTimeout(async()=>{
-    try{
-      const r = await call("resolve-account", { account:ac, bankCode:bk });
-      if(my!==rseq) return;
-      box.textContent = r.ok ? "VERIFIED " + r.accountName : (r.error || "Could not verify");
-    }catch(e){ if(my===rseq) box.textContent = e.message; }
-  },300);
+ clearTimeout(rt); const ac=$("#ac")?.value||"",bk=$("#bk")?.value||"",box=$("#ai"); if(!box) return;
+ if(ac.length!==10||!bk){ box.className="verify-box v-idle"; box.textContent="Enter 10-digit account number to verify"; return; }
+ box.className="verify-box v-idle"; box.textContent="Checking with bank..."; const my=++rseq;
+ rt=setTimeout(async()=>{ try{ const r=await call("resolve-account",{account:ac,bankCode:bk}); if(my!==rseq) return; if(r.ok){ box.className="verify-box v-ok"; box.textContent="✅ VERIFIED - "+r.accountName; } else{ box.className="verify-box v-bad"; box.textContent="❌ "+(r.error||"Could not verify"); } }catch(e){ if(my===rseq){ box.className="verify-box v-bad"; box.textContent=e.message; } } },400);
 }
 function payView(d){
-  currentDeal = d;
-  if(!d){ shell('<div class="card"><h3>Deal not found</h3></div>'); return; }
-  const S = d.status;
-  let body = "";
-  if(S === "AWAITING_PAYMENT"){
-    body = '<div class="fee">Seller verified: <b>' + esc(d.accountName) + '</b> - ' + N(d.amount) + '</div>' +
-           '<label style="font-size:12px;color:#8b90a0">Your name</label><input id="bn">' +
-           '<label style="font-size:12px;color:#8b90a0">Your phone</label><input id="bp">' +
-           '<label style="font-size:12px;color:#8b90a0">Your email</label><input id="be" type="email"><p class="err" id="msg"></p>' +
-           '<button class="btn gold" data-a="pay">PAY SAFELY</button>';
-  } else if(S === "HOLDING"){
-    const waNumber = d.sellerPhone.startsWith("0") ? "234" + d.sellerPhone.slice(1) : d.sellerPhone;
-    const waText = encodeURIComponent("SafeTrade: I just paid " + N(d.amount) + " for " + d.item + ". Please check.");
-    const waLink = "https://wa.me/" + waNumber + "?text=" + waText;
-    body = '<div class="note n-ok">Payment received. SafeTrade holds ' + N(d.amount) + ' in escrow.</div>' +
-           '<a href="' + waLink + '" target="_blank" style="display:block;text-align:center;text-decoration:none;margin-top:10px;background:#25D366;color:#000;padding:14px;border-radius:50px;font-weight:800">Notify Seller on WhatsApp</a>' +
-           '<p style="font-size:12px;color:#8b90a0;margin-top:8px;text-align:center">Only press green AFTER you receive item.</p>' +
-           '<div style="margin-top:12px"><button class="btn green" data-a="rel">I received it - pay seller</button>' +
-           '<button class="btn red" data-a="dsp" style="margin-top:6px">Report problem</button></div>';
-  } else if(S === "RELEASED"){
-    body = '<div class="note n-ok">Seller has been paid. Deal complete.</div>';
-  } else {
-    body = '<div class="note">Status: ' + esc(S) + '</div>';
-  }
-  const inner = '<div class="card"><span class="badge">' + esc(S) + '</span><h3>' + esc(d.item) + '</h3><p>Seller: ' + esc(d.sellerName) + '</p>' + body + '</div>';
-  shell(inner);
+ currentDeal=d;
+ if(!d){ shell('<div class="card"><h3>Deal not found - check link</h3><p class="sub">The link may be expired or wrong.</p></div>'); return; }
+ const S=d.status; let body="",badge="";
+ if(S==="AWAITING_PAYMENT"){
+  badge=`<span class="status-badge s-await">⏳ Awaiting Payment</span>`;
+  body=`<div class="fee-box"><span>Seller verified: <b>${esc(d.accountName)}</b> • Escrow protected • ${N(d.amount)}</span></div><label>Your full name</label><input id="bn" placeholder="Your name"><label>Your phone</label><input id="bp" placeholder="080..."><label>Your email (for receipt)</label><input id="be" type="email" placeholder="you@email.com"><div class="err" id="msg"></div><button class="btn gold" data-a="pay">🔒 PAY ${N(d.amount)} SAFELY</button><p style="text-align:center;color:var(--mu);font-size:11px;margin-top:10px">Money goes to SafeTrade escrow. Seller only gets paid after you confirm.</p>`;
+ } else if(S==="HOLDING"){
+  badge=`<span class="status-badge s-hold">✅ Payment Held in Escrow</span>`;
+  const waNum=d.sellerPhone.startsWith("0")?"234"+d.sellerPhone.slice(1):d.sellerPhone;
+  const waText=encodeURIComponent("SafeTrade: I just paid "+N(d.amount)+" for "+d.item+". Please confirm and deliver. Link: "+dealLink(d.sellerPhone,d.id));
+  const waLink="https://wa.me/"+waNum+"?text="+waText;
+  body=`<div class="note n-ok">💰 <b>${N(d.amount)}</b> is safely held by SafeTrade. Seller has NOT been paid yet. Seller will be paid only after you click "I received it".</div><a href="${waLink}" target="_blank" class="btn wa">💬 Notify Seller on WhatsApp</a><div style="margin-top:14px"><button class="btn green" data-a="rel">✅ I received it - Pay seller now</button><button class="btn red" data-a="dsp" style="margin-top:8px">🚩 Report problem / Scam</button></div>`;
+ } else if(S==="RELEASED"){
+  badge=`<span class="status-badge s-rel">✅ Seller Paid - Complete</span>`;
+  body=`<div class="note n-ok">This deal is complete. Seller has been paid ${N(d.payout||d.amount)}.</div>`;
+ } else { badge=`<span class="status-badge s-await">${esc(S)}</span>`; body=`<div class="note">Status: ${esc(S)} - Contact support if stuck.</div>`; }
+ const inner=`<div class="card">${badge}<h3 style="font-size:22px;margin-top:6px">${esc(d.item)}</h3><div class="sub">Seller: ${esc(d.sellerName)} • Verified account: <b style="color:var(--ok)">${esc(d.accountName)}</b> • ${N(d.amount)}</div>${body}</div>`;
+ shell(inner);
 }
 async function handlePay(){
-  const d = currentDeal; if(!d) return;
-  const bn = $("#bn").value.trim(), bp = $("#bp").value.trim(), be = $("#be").value.trim(), msg = $("#msg");
+ const d=currentDeal; if(!d) return;
+ const bn=$("#bn").value.trim(),bp=$("#bp").value.trim(),be=$("#be").value.trim(),msg=$("#msg");
+ if(!bn||!bp||!be){ msg.textContent="Fill all buyer fields"; return; }
+ msg.textContent="Opening Paystack secure checkout...";
+ const handler=PaystackPop.setup({key:PAYSTACK_PK,email:be,amount:d.amount*100,currency:"NGN",ref:""+Date.now(),callback:async function(res){try{msg.textContent="Confirming payment...";await updateDoc(doc(db,"sellers",d.sellerPhone,"deals",d.id),{status:"HOLDING",buyerName:bn,buyerPhone:bp,buyerEmail:be,paystackRef:res.reference,paidAt:new Date()});toast("Payment secured in escrow");payView({...d,status:"HOLDING"});}catch(e){ msg.textContent=e.message; }},onClose:()=>{ msg.textContent="Payment cancelled"; }});
+ handler.openIframe();
+}
+async function handleRelease(btn){
+ const d=currentDeal; if(!d) return;
+ if(!confirm("You confirm you RECEIVED the item in good condition? This will PAY the seller instantly and cannot be reversed.")) return;
+ const orig=btn.textContent; btn.textContent="Paying seller..."; btn.disabled=true;
+ try{ const res=await fetch(FN+"release-funds",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sellerPhone:d.sellerPhone,dealId:d.id,amount:d.amount,bankCode:d.bankCode,accountNumber:d.accountNumber||d.account,sellerName:d.sellerName,accountName:d.accountName})}); const j=await res.json(); if(!j.ok) throw new Error(j.error||"Payout failed"); await updateDoc(doc(db,"sellers",d.sellerPhone,"deals",d.id),{status:"RELEASED",releasedAt:new Date(),payout:j.payout}); toast("Paid seller "+N(j.payout)); payView({...d,status:"RELEASED",payout:j.payout}); }catch(e){ toast(e.message); btn.textContent=orig; btn.disabled=false; }
+}
+document.addEventListener("click",async(e)=>{ const t=e.target.closest("[data-a]"); if(!t) return; const a=t.dataset.a; if(a==="again") sellView(); if(a==="create") createDeal(); if(a==="copy"){const el=$("#lk");el.select();el.setSelectionRange(0,9999);navigator.clipboard.writeText(el.value);toast("Link copied"); } if(a==="pay") handlePay(); if(a==="rel") handleRelease(t); if(a==="dsp"){ if(confirm("Report this deal? Money will stay locked and support will review.")){ try{ await updateDoc(doc(db,"sellers",currentDeal.sellerPhone,"deals",currentDeal.id),{status:"DISPUTED"}); toast("Reported - money locked"); payView({...currentDeal,status:"DISPUTED"});}catch(err){toast(err.message);} } } });
+document.addEventListener("input",(e)=>{ if(e.target.id==="ac"||e.target.id==="bk") resolveAcct(); if(e.target.id==="am"){const v=Number(e.target.value||0);const el=$("#fee");if(el) el.innerHTML=v?`<span>You receive: <b>${N(v - v*0.03)}</b> (3% fee)</span>`:`<span>Enter price - 97% after fee</span>`;} });
+if(PAY){ try{ const snap=await getDoc(doc(db,"sellers",PAY[1],"deals",PAY[2])); if(snap.exists()) payView({id:snap.id,...snap.data()}); else payView(null); }catch{ payView(null); } } else { sellView(); }
+</script>
+</body>
+</html>).value.trim(), msg = $("#msg");
   if(!bn || !bp || !be){ msg.textContent = "Fill all"; return; }
   msg.textContent = "Opening Paystack...";
   const handler = PaystackPop.setup({
