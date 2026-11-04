@@ -5,33 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>SafeTrade – Secure Escrow for Nigeria</title>
 <style>
-:root{--bg:#07080c;--card:#12141b;--line:#232734;--tx:#f3f4f7;--mu:#8b90a0;--gold:#FFD34D;--gold2:#D4AF37;--ok:#3ecf74;--bad:#ff5d5d;--blue:#4aa3ff;--warn:#ffa726;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4f5f8;--card:#fff;--line:#e1e4ec;--tx:#14161d;--mu:#5d6375;--gold:#9a7400;--gold2:#b8901a}}
-:root[data-theme="dark"]{--bg:#07080c}
+:root{--bg:#07080c;--card:#12141b;--line:#232734;--tx:#f3f4f7;--mu:#8b90a0;--gold:#FFD34D;--gold2:#D4AF37;--ok:#3ecf74;--bad:#ff5d5d;--blue:#4aa3ff;--warn:#ffa726;box-sizing:border-box}
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-html,body{min-height:100%}body{background:var(--bg);color:var(--tx);padding:14px 14px 90px}
+body{background:var(--bg);color:var(--tx);padding:14px 14px 90px}
 .wrap{max-width:760px;margin:0 auto}
 .brand{display:flex;align-items:center;gap:10px}.brand b{font-size:22px;letter-spacing:.5px}.brand b i{color:var(--gold);font-style:normal}
 .hero{text-align:center;padding:26px 0 10px}.hero .brand{justify-content:center;flex-direction:column;gap:8px}.hero p{color:var(--mu);font-size:13px;margin-top:6px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:12px}
 .card h3{font-size:16px;margin-bottom:8px}.card p,.mu{font-size:13px;color:var(--mu);line-height:1.55}
-.tabs{display:flex;background:var(--card);border:1px solid var(--line);border-radius:50px;padding:4px;margin:12px 0;overflow-x:auto}
+.tabs{display:flex;background:var(--card);border:1px solid var(--line);border-radius:50px;padding:4px;margin:12px 0}
 .tab{flex:1;white-space:nowrap;padding:11px 14px;border:0;background:transparent;color:var(--mu);font-weight:700;border-radius:50px;cursor:pointer;font-size:13px}
 .tab.on{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}
 input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--tx);margin-bottom:10px;font-size:15px;outline:none}
-input:focus,select:focus{border-color:var(--gold)}
-label{font-size:12px;color:var(--mu);display:block;margin-bottom:5px}
 .btn{width:100%;padding:14px;border:0;border-radius:50px;font-weight:800;font-size:15px;cursor:pointer;margin-top:6px;color:#fff}
-.gold{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}.green{background:var(--ok);color:#000}.blue{background:var(--blue);color:#000}.red{background:var(--bad)}.out{background:transparent;border:1px solid var(--line);color:var(--tx)}
-.btn.sm{padding:9px 12px;font-size:12px;width:auto;flex:1}
-.row{display:flex;gap:8px;flex-wrap:wrap}
+.gold{background:linear-gradient(90deg,var(--gold2),var(--gold));color:#000}.green{background:var(--ok);color:#000}.blue{background:var(--blue);color:#000}.red{background:var(--bad)}
 .badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:800;margin-bottom:8px;color:#000}
+.HOLDING{background:var(--ok)}.AWAITING_PAYMENT{background:var(--warn)}.PAYING_OUT{background:var(--blue)}.RELEASED{background:var(--ok)}.DISPUTED{background:var(--bad);color:#fff}.PAYOUT_FAILED{background:var(--bad);color:#fff}.REFUNDED{background:#b18cff}.CANCELLED{background:var(--line);color:var(--tx)}
 .fee{background:rgba(212,175,55,.1);border:1px dashed var(--gold2);border-radius:12px;padding:12px;font-size:13px;line-height:1.6;margin:6px 0 10px}
 .err{color:var(--bad);font-size:13px;min-height:18px;margin-bottom:6px}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:30px;font-size:13px;z-index:200;display:none;max-width:90%}
-.HOLDING{background:var(--ok)}
-.AWAITING_PAYMENT{background:var(--warn)}.PAYING_OUT{background:var(--blue)}.PAYOUT_FAILED{background:var(--bad);color:#fff}.RELEASED{background:var(--ok)}.DISPUTED{background:var(--bad);color:#fff}
 .note{border-radius:12px;padding:11px;font-size:13px;line-height:1.5;margin:8px 0}.n-ok{background:rgba(62,207,116,.14);border:1px solid var(--ok)}.n-wait{background:rgba(255,167,38,.14);border:1px solid var(--warn)}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:30px;font-size:13px;z-index:200;display:none}
 </style>
 <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
@@ -52,28 +45,60 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const N=n=>'₦'+Number(n).toLocaleString();
 const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',4500)};
 async function call(n,body){const r=await fetch(FN+n,{method:body?'POST':'GET',headers:{'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed ('+r.status+')');return j}
-const LOGO=s=>`<svg width="${s}" height="${s}" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="#1b2030" stroke="#FFD34D" stroke-width="4" stroke-linejoin="round"/><rect x="34" y="46" width="32" height="24" rx="5" fill="#FFD34D"/></svg>`;
-const BRAND=`<div style="display:flex;align-items:center;gap:10px;justify-content:center"><div>${LOGO(40)}</div><b style="font-size:22px">Safe<i style="color:#FFD34D;font-style:normal">Trade</i></b></div>`;
-const LBL={AWAITING_PAYMENT:'⏳ AWAITING PAYMENT',HOLDING:'💰 HOLDING',PAYING_OUT:'🏦 PAYING SELLER',RELEASED:'🎉 SELLER PAID',DISPUTED:'⚠️ DISPUTED',PAYOUT_FAILED:'⚠️ PAYOUT RETRY'};
+const LOGO=s=>`<svg width="${s}" height="${s}" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="#1b2030" stroke="#FFD34D" stroke-width="4"/><rect x="34" y="46" width="32" height="24" rx="5" fill="#FFD34D"/></svg>`;
+const BRAND=`<div class="brand">${LOGO(40)}<b>Safe<i>Trade</i></b></div>`;
+const LBL={AWAITING_PAYMENT:'⏳ AWAITING PAYMENT',HOLDING:'💰 HOLDING',PAYING_OUT:'🏦 PAYING SELLER',RELEASED:'🎉 SELLER PAID',DISPUTED:'⚠️ DISPUTED',PAYOUT_FAILED:'⚠️ PAYOUT RETRY',REFUNDED:'↩️ REFUNDED',CANCELLED:'CANCELLED'};
 const badge=s=>`<span class="badge ${s}">${LBL[s]||esc(s)}</span>`;
 const FALLBACK=[['Access Bank','044'],['Fidelity Bank','070'],['First Bank','011'],['GTBank','058'],['Kuda','50211'],['Moniepoint','50515'],['OPay','999992'],['PalmPay','999991'],['UBA','033'],['Zenith Bank','057']].map(([name,code])=>({name,code}));
 let view='sell',off=null,banks=null,currentDeal=null;
 const link=(p,i)=>`${location.origin}/?pay=${p}.${i}`;
-function shell(inner,tabs){$('#app').innerHTML=`<div style="text-align:center;padding:26px 0 10px">${BRAND}<p style="color:#8b90a0;font-size:13px;margin-top:6px">We hold the buyer's money until the goods arrive. Then the seller is paid automatically.</p></div>`+(tabs?`<div style="display:flex;background:#12141b;border:1px solid #232734;border-radius:50px;padding:4px;margin:12px 0"><button style="flex:1;padding:11px;border:0;background:${view==='sell'?'linear-gradient(90deg,#D4AF37,#FFD34D)':'transparent'};color:${view==='sell'?'#000':'#8b90a0'};font-weight:700;border-radius:50px;cursor:pointer" data-a="v" data-v="sell">Sell</button><button style="flex:1;padding:11px;border:0;background:${view==='seller'?'linear-gradient(90deg,#D4AF37,#FFD34D)':'transparent'};color:${view==='seller'?'#000':'#8b90a0'};font-weight:700;border-radius:50px;cursor:pointer" data-a="v" data-v="seller">My deals</button></div>`:'')+inner}
+function shell(inner,tabs){$('#app').innerHTML=`<div class="hero">${BRAND}<p>We hold the buyer's money until the goods arrive. Then the seller is paid automatically.</p></div>`+(tabs?`<div class="tabs"><button class="tab ${view==='sell'?'on':''}" data-a="v" data-v="sell">Sell (create deal)</button><button class="tab ${view==='seller'?'on':''}" data-a="v" data-v="seller">My deals</button></div>`:'')+inner}
 
 async function sellView(done){
   if(!banks){try{const l=await call('banks');banks=Array.isArray(l)&&l.length?l:FALLBACK}catch(e){banks=FALLBACK}}
   shell(done?`<div class="card" style="text-align:center"><div style="font-size:44px">🔗</div><h3>Deal created</h3><p>Verified: <b>${esc(done.accountName)}</b><br>Send this link to buyer.</p><br><input readonly id="lk" value="${esc(link(done.phone,done.id))}"><button class="btn gold" data-a="copy">Copy link</button><a class="btn green" style="display:block;text-align:center;text-decoration:none" href="https://wa.me/?text=${encodeURIComponent('Pay safely: '+link(done.phone,done.id))}" target="_blank">Share on WhatsApp</a></div>`:
-  `<div class="card"><h3>🔒 Create a Safe Deal</h3><label>What are you selling?</label><input id="item" maxlength="80"><label>Price (₦)</label><input id="am" type="number" min="1000"><div class="fee" id="fee">Enter price</div><label>Your name</label><input id="sn"><label>Your phone</label><input id="sp" placeholder="08012345678"><label>Your bank</label><select id="bk"><option value="">Choose bank</option>${banks.map(b=>`<option value="${esc(b.code)}">${esc(b.name)}</option>`).join('')}</select><label>Account number</label><input id="ac" maxlength="10"><div class="fee" id="ai">Enter account number</div><p class="err" id="msg"></p><button class="btn gold" data-a="create">CREATE DEAL LINK</button></div>`,true);
+  `<div class="card"><h3>🔒 Create a Safe Deal</h3><label>What are you selling?</label><input id="item" maxlength="80"><label>Price (₦)</label><input id="am" type="number" min="1000"><div class="fee" id="fee">Enter price</div><label>Your name</label><input id="sn"><label>Your phone</label><input id="sp" placeholder="08012345678"><label>Your bank</label><select id="bk"><option value="">Choose bank</option>${banks.map(b=>`<option value="${esc(b.code)}">${esc(b.name)}</option>`).join('')}</select><label>Account number</label><input id="ac" maxlength="10"><div class="fee" id="ai">Enter 10-digit account</div><p class="err" id="msg"></p><button class="btn gold" data-a="create">CREATE DEAL LINK</button></div>`,true);
 }
 async function createDeal(){
-  const g=i=>$(i).value.trim(),m=$('#msg');m.textContent='Verifying...';
+  const g=i=>$(i).value.trim(),m=$('#msg');m.textContent='Verifying account...';
   try{const r=await call('create-deal',{item:g('#item'),amount:Number(g('#am')),sellerName:g('#sn'),sellerPhone:g('#sp'),bankCode:$('#bk').value,account:g('#ac')});sellView(r)}catch(e){m.textContent=e.message}
 }
 let rseq=0,rt;
 function resolveAcct(){clearTimeout(rt);const ac=$('#ac')?$('#ac').value:'',bk=$('#bk')?$('#bk').value:'',box=$('#ai');if(!box)return;if(ac.length!==10||!bk){box.textContent='Enter 10-digit account';return}box.textContent='Checking...';const my=++rseq;rt=setTimeout(async()=>{try{const r=await call('resolve-account',{account:ac,bankCode:bk});if(my!==rseq)return;box.innerHTML=r.ok?`✅ ${esc(r.accountName)}`:`⚠️ ${esc(r.error||'Could not verify')}`}catch(e){if(my===rseq)box.textContent='⚠️ '+e.message}},300)}
+
 function sellerView(list,phone){
-  shell(`<div class="card"><h3>📦 My deals</h3><input id="lp" placeholder="080..." value="${esc(phone||'')}"><button class="btn gold" data-a="find">SHOW MY DEALS</button><p class="err" id="msg"></p></div>`+(list?list.map(d=>`<div class="card">${badge(d.status)}<h3>${esc(d.item)}</h3><p>${N(d.amount)}</p>${d.status==='AWAITING_PAYMENT'?`<input readonly value="${esc(link(d.sellerPhone,d.id))}">`:d.status==='HOLDING'?'<div class="note n-ok">✅ Paid - Deliver now</div>':''}</div>`).join(''):'<div class="card"><p>No deals</p></div>'),true);
+  shell(`<div class="card"><h3>📦 My deals</h3><input id="lp" placeholder="080..." value="${esc(phone||'')}"><button class="btn gold" data-a="find">SHOW MY DEALS</button><p class="err" id="msg"></p></div>`+(list?list.map(d=>`<div class="card">${badge(d.status)}<h3>${esc(d.item)}</h3><p>${N(d.amount)}</p></div>`).join(''):'<div class="card"><p>No deals</p></div>'),true);
+}
+function findDeals(){const p=$('#lp').value.trim();if(!/^0\d{10}$/.test(p))return $('#msg').textContent='Enter 11 digits.';off&&off();off=onSnapshot(collection(db,'sellers',p,'deals'),s=>{sellerView(s.docs.map(x=>({id:x.id,...x.data()})),p)});}
+
+function payView(d){
+  currentDeal=d;const id=PAY?PAY[2]:'',S=d&&d.status,key='st_t_'+id,tok=localStorage.getItem(key);
+  if(!d)return shell('<div class="card"><h3>Deal not found</h3></div>');
+  let body='';
+  if(S==='AWAITING_PAYMENT')body=`<div class="fee">Seller verified: <b>${esc(d.accountName)}</b> · ${N(d.amount)}</div><label>Your name</label><input id="bn"><label>Your phone</label><input id="bp"><label>Your email</label><input id="be" type="email"><p class="err" id="msg"></p><button class="btn gold" data-a="pay">💳 PAY SAFELY</button>`;
+  else if(S==='HOLDING')body=`<div class="note n-ok">💰 Payment received. SafeTrade holds ${N(d.amount)}.</div>
+  <a class="btn gold" style="display:block;text-align:center;text-decoration:none;margin-top:10px" href="https://wa.me/234${esc(d.sellerPhone.slice(1))}?text=${encodeURIComponent('SafeTrade: I just paid '+N(d.amount)+' for '+d.item+'. Money in escrow. Please deliver. '+location.href)}" target="_blank" rel="noopener">📱 Notify Seller on WhatsApp</a>
+  <div style="margin-top:12px"><p class="mu">Only press AFTER you receive item.</p><button class="btn green" data-a="rel">✅ I received it – pay the seller</button><button class="btn red" data-a="dsp">⚠️ Report problem</button>${tok?`<p class="mu" style="margin-top:8px">Code: <b>${esc(tok)}</b></p>`:`<input id="rc" placeholder="Release code" style="margin-top:8px">`}</div>`;
+  else if(S==='RELEASED'||S==='PAYING_OUT')body='<div class="note n-ok">🎉 Seller has been paid. Deal complete.</div>';
+  else body=`<div class="note n-wait">Status: ${esc(S)}</div>`;
+  shell(`<div class="card">${badge(S)}<h3>${esc(d.item)}</h3><p>Seller: ${esc(d.sellerName)}</p>${body}</div>`);
+}
+
+async function handlePay(){
+  const d=currentDeal;if(!d)return;const bn=$('#bn')?.value.trim(),bp=$('#bp')?.value.trim(),be=$('#be')?.value.trim(),msg=$('#msg');if(!bn||!bp||!be){msg.textContent='Fill all';return}
+  msg.textContent='Opening Paystack...';const handler=PaystackPop.setup({key:PAYSTACK_PK,email:be,amount:d.amount*100,currency:'NGN',ref:''+Date.now(),callback:async function(res){try{msg.textContent='Verifying...';localStorage.setItem('st_t_'+d.id,res.reference);await updateDoc(doc(db,'sellers',d.sellerPhone,'deals',d.id),{status:'HOLDING',buyerName:bn,buyerPhone:bp,buyerEmail:be,paystackRef:res.reference,paidAt:new Date()});toast('✅ Paid - money in escrow');payView({...d,status:'HOLDING',buyerName:bn});}catch(e){msg.textContent=e.message}},onClose:function(){msg.textContent='Payment cancelled'}});handler.openIframe();
+}
+async function handleRelease(btn){
+  const d=currentDeal;if(!d)return;const code=$('#rc')?$('#rc').value.trim():localStorage.getItem('st_t_'+d.id);if(!code){toast('Enter release code');return}if(!confirm('Confirm you received item? This will PAY SELLER now.'))return;
+  const orig=btn.textContent;btn.textContent='⏳ Paying seller...';btn.disabled=true;
+  try{const res=await fetch(FN+'release-funds',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sellerPhone:d.sellerPhone,dealId:d.id,amount:d.amount,bankCode:d.bankCode,accountNumber:d.accountNumber||d.account,sellerName:d.sellerName,accountName:d.accountName})});const j=await res.json();if(!j.ok)throw new Error(j.error||'Payout failed');await updateDoc(doc(db,'sellers',d.sellerPhone,'deals',d.id),{status:'RELEASED',releasedAt:new Date(),payout:j.payout});toast(`🎉 Paid ₦${Number(j.payout).toLocaleString()} to seller`);payView({...d,status:'RELEASED'});}catch(e){toast('❌ '+e.message);btn.textContent=orig;btn.disabled=false;try{await updateDoc(doc(db,'sellers',d.sellerPhone,'deals',d.id),{status:'PAYING_OUT',payoutError:e.message});}catch{}}
+}
+document.addEventListener('click',async(e)=>{const t=e.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;if(a==='v'){view=t.dataset.v;if(view==='sell')sellView();else sellerView(null,'');}if(a==='create')createDeal();if(a==='find')findDeals();if(a==='copy'){const el=$('#lk');el.select();document.execCommand('copy');toast('Copied');}if(a==='pay')handlePay();if(a==='rel')handleRelease(t);if(a==='dsp'){if(confirm('Report problem? Money stays locked.')){try{await updateDoc(doc(db,'sellers',currentDeal.sellerPhone,'deals',currentDeal.id),{status:'DISPUTED'});toast('Disputed - SafeTrade will review');payView({...currentDeal,status:'DISPUTED'});}catch(e){toast(e.message);}}}});
+document.addEventListener('input',(e)=>{if(e.target.id==='ac'||e.target.id==='bk')resolveAcct();if(e.target.id==='am'){const v=Number(e.target.value||0),el=$('#fee');if(el)el.textContent=v?`You receive: ${N(v - v*0.03)}`:'Enter price';}});
+if(PAY){try{const snap=await getDoc(doc(db,'sellers',PAY[1],'deals',PAY[2]));if(snap.exists())payView({id:snap.id,...snap.data()});else payView(null);}catch{payView(null);}}else{sellView();}
+</script>
+</body>
+</html>e);
 }
 function findDeals(){const p=$('#lp').value.trim();if(!/^0\d{10}$/.test(p))return $('#msg').textContent='Enter 11 digits.';off&&off();off=onSnapshot(collection(db,'sellers',p,'deals'),s=>{sellerView(s.docs.map(x=>({id:x.id,...x.data()})),p)});}
 function payView(d){
