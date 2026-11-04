@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>SafeTrade – Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070A12;--bg2:#0E1220;--card:#111527;--card2:#171C33;--line:#222845;--tx:#F5F6FA;--mu:#8A90A8;--gold:#FFD84D;--gold2:#FFC01E;--ok:#2ECC71;--bad:#FF5A5A;--warn:#FFB020;--shadow:0 20px 60px rgba(0,0,0,.5)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+body{background:radial-gradient(1200px 600px at 50% -20%,#1C2350 0%,var(--bg) 60%),var(--bg);color:var(--tx);min-height:100vh;padding:0 14px 80px}
+.wrap{max-width:980px;margin:0 auto}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:18px 2px;gap:10px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.5px}
+.logo span{color:var(--gold)}
+.tag{background:rgba(255,216,77,.12);border:1px solid rgba(255,216,77,.35);color:var(--gold);padding:4px 10px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:1px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
+.card h3{font-size:17px;margin-bottom:4px}
+.sub{color:var(--mu);font-size:13px;margin-bottom:16px;line-height:1.5}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mu);margin:12px 0 6px}
+input,select{width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--bg2);color:var(--tx);font-size:14px;font-weight:500;outline:none;transition:.2s}
+input:focus,select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,216,77,.15)}
+.btn{padding:13px 18px;border:0;border-radius:100px;font-weight:800;font-size:13px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;justify-content:center;gap:6px;width:auto}
+.btn:active{transform:scale(.98)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.full{width:100%;margin-top:14px;padding:16px;font-size:15px}
+.gold{background:linear-gradient(180deg,var(--gold),var(--gold2));color:#000}
+.green{background:var(--ok);color:#000}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--tx)}
+.red{background:rgba(255,90,90,.12);border:1px solid rgba(255,90,90,.3);color:var(--bad)}
+.warnb{background:rgba(255,176,32,.12);border:1px solid rgba(255,176,32,.35);color:var(--warn)}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-top:10px;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}
+.stat b{display:block;font-size:20px;margin-bottom:2px}
+.stat span{font-size:11px;color:var(--mu);font-weight:700;text-transform:uppercase}
+.bar{display:grid;grid-template-columns:1fr 170px;gap:10px;margin-bottom:12px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-bottom:8px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;transition:.15s}
+.row:hover{border-color:var(--gold)}
+.row b{font-size:15px}.row small{color:var(--mu);font-size:12px}
+.amt{font-weight:800;text-align:right}
+.st{display:inline-block;padding:4px 10px;border-radius:100px;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.AWAITING_PAYMENT{background:rgba(255,176,32,.15);color:var(--warn)}
+.HOLDING{background:rgba(255,216,77,.15);color:var(--gold)}
+.RELEASED{background:rgba(46,204,113,.15);color:var(--ok)}
+.DISPUTED{background:rgba(255,90,90,.15);color:var(--bad)}
+.REFUNDED{background:rgba(138,144,168,.18);color:var(--mu)}
+.empty{text-align:center;color:var(--mu);padding:40px 0;font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;justify-content:center;z-index:100;padding:10px}
+.modal.on{display:flex}
+.sheet{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px;width:100%;max-width:520px;max-height:90vh;overflow:auto}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px}
+.kv span{color:var(--mu)}.kv b{text-align:right;word-break:break-all}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:#000;padding:12px 18px;border-radius:100px;font-size:13px;font-weight:700;z-index:200;display:none}
+.hide{display:none!important}
+@media(max-width:560px){.stats{grid-template-columns:1fr 1fr}.bar{grid-template-columns:1fr}}
+iframe[src*="netlify"],#netlify-badge,.netlify-badge{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="nav">
+ <div class="logo"><svg width="34" height="34" viewBox="0 0 100 100"><path d="M50 4 12 18v28c0 24 16 41 38 50 22-9 38-26 38-50V18Z" fill="#151A30" stroke="#FFD84D" stroke-width="4"/><rect x="34" y="46" width="32" height="24" rx="6" fill="#FFD84D"/><circle cx="50" cy="58" r="5" fill="#000"/></svg>Safe<span>Trade</span> <span class="tag">ADMIN</span></div>
+ <div id="navR" class="hide" style="display:flex;gap:8px"><button class="btn ghost" id="rf">↻ Refresh</button><button class="btn ghost" id="ex">⬇ CSV</button><button class="btn red" id="so">Sign out</button></div>
+</div>
+
+<div id="login" class="card" style="max-width:420px;margin:40px auto">
+ <h3>🔐 Admin sign in</h3><div class="sub">Authorized SafeTrade staff only.</div>
+ <label>Email</label><input id="em" type="email" autocomplete="username">
+ <label>Password</label><input id="pw" type="password" autocomplete="current-password">
+ <div class="err" id="le"></div>
+ <button class="btn gold full" id="li">Sign in</button>
+</div>
+
+<div id="dash" class="hide">
+ <div class="stats" id="stats"></div>
+ <div class="bar"><input id="q" placeholder="Search item, seller, buyer, phone, ID…"><select id="sf"><option value="">All statuses</option><option>AWAITING_PAYMENT</option><option>HOLDING</option><option>DISPUTED</option><option>RELEASED</option><option>REFUNDED</option></select></div>
+ <div id="list"></div>
+</div>
+</div>
+
+<div class="modal" id="md"><div class="sheet" id="sheet"></div></div>
+<div id="toast"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getFirestore,collectionGroup,getDocs,doc,getDoc,updateDoc} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const CFG={apiKey:"AIzaSyDibL7nsZv_s7aokIE8jRZTQ9BvzZMA-pE",authDomain:"safetrade-46ecb.firebaseapp.com",projectId:"safetrade-46ecb",storageBucket:"safetrade-46ecb.firebasestorage.app",messagingSenderId:"306044200789",appId:"1:306044200789:web:3225f3c95e616b014d31dc"};
+const FN="/.netlify/functions/";
+const app=initializeApp(CFG),auth=getAuth(app),db=getFirestore(app);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const N=n=>"₦"+Number(n||0).toLocaleString();
+const toast=m=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._h);t._h=setTimeout(()=>t.style.display="none",3500)};
+const ts=v=>v?(v.toDate?v.toDate():new Date(v)):null;
+const fd=v=>{const d=ts(v);return d&&!isNaN(d)?d.toLocaleString("en-NG",{dateStyle:"medium",timeStyle:"short"}):"—"};
+let deals=[];
+
+onAuthStateChanged(auth,async u=>{
+ if(!u){show(false);return}
+ try{
+  const a=await getDoc(doc(db,"admins",u.uid));
+  if(!a.exists()){await signOut(auth);$("#le").textContent="This account is not an admin.";return}
+  show(true);load();
+ }catch(e){await signOut(auth);$("#le").textContent="Access check failed: "+e.message}
+});
+function show(on){$("#login").classList.toggle("hide",on);$("#dash").classList.toggle("hide",!on);$("#navR").classList.toggle("hide",!on)}
+$("#li").onclick=async()=>{
+ $("#le").textContent="";
+ try{await signInWithEmailAndPassword(auth,$("#em").value.trim(),$("#pw").value)}
+ catch(e){$("#le").textContent="Invalid email or password"}
+};
+$("#pw").onkeydown=e=>{if(e.key==="Enter")$("#li").click()};
+$("#so").onclick=()=>signOut(auth);
+$("#rf").onclick=load;
+
+async function load(){
+ $("#list").innerHTML='<div class="empty">Loading deals…</div>';
+ try{
+  const s=await getDocs(collectionGroup(db,"deals"));
+  deals=s.docs.map(x=>({ref:x.ref,id:x.id,...x.data()}));
+  deals.sort((a,b)=>(ts(b.paidAt||b.createdAt)||0)-(ts(a.paidAt||a.createdAt)||0));
+  render();
+ }catch(e){$("#list").innerHTML='<div class="empty">Could not load deals: '+esc(e.message)+'<br>Check Firestore rules for admins.</div>'}
+}
+function render(){
+ const sum=f=>deals.filter(f).reduce((t,d)=>t+Number(d.amount||0),0);
+ const paid=d=>["HOLDING","RELEASED","DISPUTED"].includes(d.status);
+ const rel=sum(d=>d.status==="RELEASED");
+ $("#stats").innerHTML=[
+  [deals.length,"Total deals"],
+  [N(sum(paid)),"Total paid in"],
+  [N(sum(d=>d.status==="HOLDING")),"Held in escrow"],
+  [N(rel),"Released"],
+  [deals.filter(d=>d.status==="DISPUTED").length,"Disputes"],
+  [N(rel*0.03),"Fees earned (3%)"]
+ ].map(x=>`<div class="stat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
+ const q=$("#q").value.toLowerCase(),sf=$("#sf").value;
+ const L=deals.filter(d=>(!sf||d.status===sf)&&(!q||[d.item,d.sellerName,d.sellerPhone,d.buyerName,d.buyerPhone,d.buyerEmail,d.accountName,d.id].join(" ").toLowerCase().includes(q)));
+ $("#list").innerHTML=L.length?L.map(d=>`<div class="row" data-id="${esc(d.ref.path)}"><b>${esc(d.item)}</b><div class="amt">${N(d.amount)}</div><small>${esc(d.sellerName)} → ${esc(d.buyerName||"no buyer yet")} • ${fd(d.paidAt||d.createdAt)}</small><div style="text-align:right"><span class="st ${esc(d.status)}">${esc(d.status)}</span></div></div>`).join(""):'<div class="empty">No deals found.</div>';
+}
+$("#q").oninput=render;$("#sf").onchange=render;
+$("#list").onclick=e=>{const r=e.target.closest(".row");if(r)open(r.dataset.id)};
+
+function open(path){
+ const d=deals.find(x=>x.ref.path===path);if(!d)return;
+ const kv=(k,v)=>`<div class="kv"><span>${k}</span><b>${v}</b></div>`;
+ const can=["HOLDING","DISPUTED"].includes(d.status);
+ $("#sheet").innerHTML=`<span class="st ${esc(d.status)}">${esc(d.status)}</span><h3 style="font-size:20px;margin:10px 0 8px">${esc(d.item)}</h3>`
+ +kv("Amount",N(d.amount))+kv("Seller fee (3%)",N(d.amount*0.03))+kv("Seller payout",N(d.amount*0.97))
+ +kv("Seller",esc(d.sellerName))+kv("Seller phone",esc(d.sellerPhone))+kv("Bank account",esc(d.accountName)+" • "+esc(d.accountNumber||d.account||"")+" • "+esc(d.bankCode))
+ +kv("Buyer",esc(d.buyerName||"—"))+kv("Buyer phone",esc(d.buyerPhone||"—"))+kv("Buyer email",esc(d.buyerEmail||"—"))
+ +kv("Paystack ref",esc(d.paystackRef||"—"))+kv("Paid at",fd(d.paidAt))+kv("Released at",fd(d.releasedAt))+kv("Deal ID",esc(d.id))
+ +`<div class="acts">`
+ +(can?`<button class="btn green" data-a="rel">✅ Release to seller</button><button class="btn warnb" data-a="ref">↩ Refund buyer</button>`:"")
+ +(d.status==="HOLDING"?`<button class="btn red" data-a="dsp">🚩 Mark disputed</button>`:"")
+ +`<button class="btn ghost" data-a="x">Close</button></div>`
+ +(can?`<p class="sub" style="margin-top:12px">Refund only marks the deal as refunded. Send the money back from your Paystack dashboard using the Paystack ref above.</p>`:"");
+ $("#md").classList.add("on");
+ $("#sheet").onclick=async e=>{
+  const b=e.target.closest("[data-a]");if(!b)return;const a=b.dataset.a;
+  if(a==="x")return close();
+  b.disabled=true;
+  try{
+   if(a==="rel"){
+    if(!confirm("Pay "+N(d.amount*0.97)+" to "+d.accountName+"? This cannot be reversed."))throw 0;
+    const r=await fetch(FN+"release-funds",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sellerPhone:d.sellerPhone,dealId:d.id,amount:d.amount,bankCode:d.bankCode,accountNumber:d.accountNumber||d.account,sellerName:d.sellerName,accountName:d.accountName})});
+    const j=await r.json().catch(()=>({}));if(!j.ok)throw new Error(j.error||"Payout failed");
+    await upd(d,{status:"RELEASED",releasedAt:new Date(),payout:j.payout,resolvedBy:auth.currentUser.email});toast("Seller paid "+N(j.payout));
+   }
+   if(a==="ref"){if(!confirm("Mark as refunded to buyer?"))throw 0;await upd(d,{status:"REFUNDED",refundedAt:new Date(),resolvedBy:auth.currentUser.email});toast("Marked refunded")}
+   if(a==="dsp"){if(!confirm("Lock this deal as disputed?"))throw 0;await upd(d,{status:"DISPUTED"});toast("Deal locked")}
+   close();render();
+  }catch(err){if(err)toast(err.message);b.disabled=false}
+ };
+}
+async function upd(d,f){await updateDoc(d.ref,f);Object.assign(d,f)}
+function close(){$("#md").classList.remove("on")}
+$("#md").onclick=e=>{if(e.target.id==="md")close()};
+
+$("#ex").onclick=()=>{
+ const H=["id","item","amount","status","sellerName","sellerPhone","buyerName","buyerPhone","buyerEmail","paystackRef","paidAt","releasedAt"];
+ const c=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+ const rows=deals.map(d=>H.map(h=>c(h.endsWith("At")?fd(d[h]):d[h])).join(","));
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(new Blob([[H.join(","),...rows].join("\n")],{type:"text/csv"}));
+ a.download="safetrade-deals.csv";a.click();
+};
+</script>
+</body>
+</html>
+  
